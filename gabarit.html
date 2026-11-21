@@ -10,7 +10,7 @@
 html,body{height:100%;margin:0}
 body{background:var(--fond);color:var(--v);font:16px/1.45 "SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;
   text-shadow:0 0 6px #33e06a66;display:grid;grid-template-rows:auto 1fr;gap:14px;padding:14px 16px 16px;overflow:hidden}
-body::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(#0000 0 2px,#0004 2px 3px)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:3;background:repeating-linear-gradient(#0000 0 2px,#0004 2px 3px)}
 #niveaux{display:flex;gap:1ch;flex-wrap:wrap}
 #niveaux button.fait{color:var(--clair)}
 #imposes{white-space:pre;color:var(--v2);padding-left:3ch}
@@ -36,6 +36,9 @@ main{display:grid;grid-template-columns:minmax(30ch,27%) 1fr 36ch;gap:14px;min-h
 textarea{font:inherit;color:var(--clair);text-shadow:inherit;background:none;border:0;outline:0;resize:none;padding:0;caret-color:var(--clair);text-transform:uppercase;white-space:pre;overflow:auto}
 textarea::placeholder{color:var(--v3)}
 #compte.ok{color:var(--clair)}
+#lettres{color:var(--v2);margin-top:6px}
+#fete{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+#fete[hidden]{display:none}
 p{margin:0}
 </style>
 </head>
@@ -47,10 +50,11 @@ p{margin:0}
   <div class="droite">
     <section class="cadre"><h2 id="nom"></h2><p id="consigne"></p></section>
     <section class="cadre"><h2>RÈGLES</h2><div id="imposes"></div><div class="saisie"><div id="marge" aria-hidden="true"></div>
-      <textarea id="texte" spellcheck="false" autocapitalize="characters" aria-label="règles, une par ligne : motif > remplacement" placeholder="OO > T"></textarea></div></section>
+      <textarea id="texte" spellcheck="false" autocapitalize="characters" aria-label="règles, une par ligne : motif > remplacement" placeholder="AA > B"></textarea></div><p id="lettres">lettres permises : A B C D E</p></section>
     <section class="cadre"><h2>BILAN</h2><p id="bilan"></p></section>
   </div>
 </main>
+<canvas id="fete" hidden aria-hidden="true"></canvas>
 <script>
 'use strict';
 const DONNEES=/*DONNEES*/null;
@@ -80,14 +84,17 @@ function explorer(depart,regles,attendu,plafond){
 /* règles en texte : une par ligne, « motif > remplacement » (>, ->, → ou = ; # pour un commentaire) */
 function lire(texte){const regles=[],fautes=[];
   texte.split('\n').forEach((brut,i)=>{const l=brut.replace(/#.*/,'').trim().toUpperCase();if(!l)return;
-    const m=l.match(/^([OTVYX]+)\s*(?:->|=>|→|>|=)\s*([OTVYX]*)$/);if(m)regles.push({l:m[1],r:m[2]});else fautes.push(i)});
+    const m=l.match(/^([A-E]+)\s*(?:->|=>|→|>|=)\s*([A-E]*)$/);if(m)regles.push({l:m[1],r:m[2]});else fautes.push(i)});
   return{regles,fautes}}
 const $=id=>document.getElementById(id);
-const garde=(()=>{try{return JSON.parse(localStorage.getItem('reecriture')||'{}')}catch(e){return{}}})();
+const CLE='reecriture-abc';
+const garde=(()=>{try{const v=localStorage.getItem(CLE);if(v)return JSON.parse(v);
+  const vieux=JSON.parse(localStorage.getItem('reecriture')||'{}'),tr={O:'A',T:'B',V:'C',Y:'D',X:'E'};
+  for(const k in vieux)vieux[k]=String(vieux[k]).toUpperCase().replace(/[OTVYX]/g,c=>tr[c]);return vieux}catch(e){return{}}})();
 const E={niv:0,decal:{x:0,y:0},jeux:NIVEAUX.map(n=>({texte:garde[n.id]||'',sel:Math.max(0,n.tests.indexOf(n.depart))}))};
 const jeu=()=>E.jeux[E.niv],niveau=()=>NIVEAUX[E.niv];
 const calme=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let regles=[],plan=null,choix=null,t0=0,pluie=0;
+let regles=[],plan=null,choix=null,t0=0,fete=null;
 /* ---------- arbre ---------- */
 const cv=$('arbre'),cx=cv.getContext('2d');let L=0,H=0,corps=20,cw=12;
 const police=()=>`${corps}px "SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace`;
@@ -103,19 +110,15 @@ function disposer(){
   for(const et of etages)if(et){const d=(large-et.w)/2;for(const n of et)n.x+=d}
   plan={g,large,etages:etages.length};
   // corps de texte : le plus grand qui tient, entre 13 et 30
-  corps=30;for(;corps>13;corps--){cx.font=police();const c=cx.measureText('O').width;if((large+2)*c<=L&&(plan.etages*3.4-1.4)*corps<=H)break}
-  cx.font=police();cw=cx.measureText('O').width;
+  corps=30;for(;corps>13;corps--){cx.font=police();const c=cx.measureText('A').width;if((large+2)*c<=L&&(plan.etages*3.4-1.4)*corps<=H)break}
+  cx.font=police();cw=cx.measureText('A').width;
 }
-const GLYPHES='OTVYX01<>=/';
+const GLYPHES='ABCDE01<>=/';
 function tracer(t){
   cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cx.clearRect(0,0,L,H);if(!plan)return false;
   const N=plan.g.N,ph=corps*3.4,lw=plan.large*cw,ox=lw<L?(L-lw)/2:cw-E.decal.x,oy=(plan.etages*ph<H?corps*.6:corps*.6-E.decal.y);
   plan.ox=ox;plan.oy=oy;plan.ph=ph;
   const age=calme?1e9:t-t0;let vivant=age<420;
-  if(pluie&&!calme){const a=(t-pluie)/1600;if(a<1){vivant=true;cx.font=police();cx.textBaseline='top';
-      for(let c=0;c*cw<L;c++){const v=((c*7919)%13)/13,tete=(a*1.6-v*.6)*H*1.3;
-        for(let k=0;k<14;k++){const y=tete-k*corps;if(y<0||y>H)continue;cx.fillStyle=k?`rgba(51,224,106,${.5*(1-k/14)*(1-a)})`:`rgba(201,255,217,${1-a})`;
-          cx.fillText(GLYPHES[(c*31+k*17+(t/90|0))%GLYPHES.length],c*cw,y)}}}else pluie=0}
   cx.lineWidth=1;
   for(const n of plan.g.V)for(const e of n.succ){const m=N[e.to];if(!m.vu||m.d<=n.d)continue;
     cx.strokeStyle=!n.bon?'#8a2a22':!m.bon?'#ff4b3a':'#1c7a3c';cx.lineWidth=n.bon&&!m.bon?2:1;
@@ -139,31 +142,83 @@ let boucle=0;
 function peindre(){cancelAnimationFrame(boucle);const pas=t=>{if(tracer(t))boucle=requestAnimationFrame(pas)};boucle=requestAnimationFrame(pas)}
 function mesurer(){const b=$('ecran');L=b.clientWidth;H=b.clientHeight;cv.width=L*devicePixelRatio;cv.height=H*devicePixelRatio}
 /* ---------- panneaux ---------- */
-function essais(){
-  const n=niveau(),z=$('essais'),large=Math.max(...n.tests.map(w=>w.length+n.sortie(w).length))+5;
-  z.style.gridTemplateColumns=`repeat(auto-fill,minmax(${large}ch,1fr))`;z.textContent='';let ok=0;
+const juger=(n,rg)=>{LMAX=n.lmax||48;return n.tests.map(w=>explorer(w,rg,n.sortie(w),6000).ok)};
+function essais(saisie){
+  const n=niveau(),j=jeu(),z=$('essais'),res=juger(n,regles),ko=res.indexOf(false),large=Math.max(...n.tests.map(w=>w.length+n.sortie(w).length))+5;
+  // après une frappe, si l'essai affiché passe, montrer le premier qui échoue
+  if(saisie&&ko>=0&&res[j.sel]){j.sel=ko;E.decal={x:0,y:0}}
+  z.style.gridTemplateColumns=`repeat(auto-fill,minmax(${large}ch,1fr))`;z.textContent='';
   const lm=Math.max(...n.tests.map(w=>w.length));
-  n.tests.forEach((w,i)=>{const s=n.sortie(w),juste=explorer(w,regles,s,6000).ok;if(juste)ok++;
-    const b=document.createElement('button');b.className=juste?'ok':'ko';b.setAttribute('aria-pressed',i===jeu().sel);
+  n.tests.forEach((w,i)=>{const s=n.sortie(w),juste=res[i];
+    const b=document.createElement('button');b.className=juste?'ok':'ko';b.setAttribute('aria-pressed',i===j.sel);
     b.textContent=(juste?'✓ ':'✗ ')+w.padEnd(lm)+' → '+(s||'·');b.setAttribute('aria-label',w+' doit donner '+s+(juste?', juste':', faux'));
-    b.onclick=()=>{jeu().sel=i;E.decal={x:0,y:0};tout(true)};z.append(b)});
-  const fini=ok===n.tests.length;$('compte').textContent=ok+'/'+n.tests.length;$('compte').className=fini?'ok':'';
-  if(fini&&!jeu().resolu)pluie=performance.now();jeu().resolu=fini;
+    b.onclick=()=>{j.sel=i;E.decal={x:0,y:0};tout(true)};z.append(b)});
+  if(saisie)z.children[j.sel].scrollIntoView({block:'nearest'});
+  const fini=ko<0,neuf=fini&&!j.resolu;$('compte').textContent=res.filter(x=>x).length+'/'+n.tests.length;$('compte').className=fini?'ok':'';
+  j.resolu=fini;
   [...$('niveaux').children].forEach((b,i)=>{b.setAttribute('aria-pressed',i===E.niv);b.className=E.jeux[i].resolu?'fait':''});
+  return neuf;
 }
-function tout(anime){
+function tout(anime,saisie){
   const n=niveau(),lu=lire(jeu().texte);regles=n.imposes.concat(lu.regles);LMAX=n.lmax||48;
   $('imposes').textContent=n.imposes.map(x=>x.l+' > '+x.r).join('\n');$('nom').textContent=String(E.niv+1).padStart(2,'0')+' '+n.nom;
   const lignes=jeu().texte.split('\n');$('marge').innerHTML=lignes.map((_,i)=>lu.fautes.includes(i)?'<span class="ko">?</span>':String(i+1)).join('\n');
-  $('consigne').textContent=n.consigne;const w=n.tests[jeu().sel];$('titre').textContent=w+' → '+(n.sortie(w)||'·');
+  $('consigne').textContent=n.consigne;
   $('bilan').textContent=lu.regles.length+' règle'+(lu.regles.length>1?'s':'')+', '+lu.regles.reduce((s,r)=>s+r.l.length+r.r.length,0)+' symboles';
-  essais();disposer();if(anime)t0=performance.now();peindre();
+  const neuf=essais(saisie),w=n.tests[jeu().sel];$('titre').textContent=w+' → '+(n.sortie(w)||'·');
+  disposer();if(anime)t0=performance.now();peindre();if(saisie&&neuf)feter();
 }
+/* ---------- validation : toutes les dérivations défilent, puis niveau suivant ---------- */
+const fc=$('fete'),fx=fc.getContext('2d');
+function feter(){
+  const n=niveau(),W=innerWidth,Ht=innerHeight,px=15;LMAX=n.lmax||48;let mots=0,pas=0;
+  const chemins=n.tests.map(w=>{const g=explorer(w,regles,n.sortie(w),6000),c=[];mots+=g.N.length;
+    for(let k=g.N[0];;k=g.N[k.succ[0].to]){c.push(k.w||'·');if(!k.succ.length)break}pas+=c.length-1;return c});
+  fc.hidden=false;fc.width=W*devicePixelRatio;fc.height=Ht*devicePixelRatio;
+  fx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);fx.font=`${px}px "SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace`;
+  const c=fx.measureText('A').width,lv=Math.max(...chemins.map(ch=>Math.max(...ch.map(w=>w.length))))+4,nv=Math.max(1,Math.floor(W/c/lv)),R=Math.floor(Ht/(px*1.3));
+  // une voie = une bande verticale où s'enchaînent des essais, un mot de la dérivation par ligne
+  const voies=Array.from({length:nv},(_,v)=>{const b=[];
+    const mettre=ch=>ch.forEach((w,k)=>b.push({w,fin:k===ch.length-1}));
+    if(v<chemins.length)for(let i=v;i<chemins.length;i+=nv)mettre(chemins[i]);else mettre(chemins[v%chemins.length]);
+    return{b,dec:(v*7919)%R,x:(v+.5)*W/nv-(lv-4)*c/2}});
+  const longue=Math.max(...voies.map(v=>v.b.length)),T=calme?0:Math.max(2200,Math.min(4500,longue*22));
+  for(const v of voies)v.vit=Math.max(v.b.length/Math.max(T,1),.016)*(.85+((v.dec*13)%30)/100);
+  const suivant=E.niv<NIVEAUX.length-1?NIVEAUX[E.niv+1]:null;
+  fete={t:performance.now(),T,voies,R,px,c,W,Ht,essais:chemins.length,mots,pas,suivant};
+  requestAnimationFrame(defiler);
+}
+function defiler(t){
+  if(!fete)return;const f=fete,a=t-f.t,fin=a>=f.T,q=fin?1:a/f.T;
+  if(a>f.T+2600){finir(true);return}
+  fx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);fx.clearRect(0,0,f.W,f.Ht);fx.fillStyle='rgba(2,6,3,.93)';fx.fillRect(0,0,f.W,f.Ht);
+  fx.font=`${f.px}px "SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace`;fx.textBaseline='top';fx.textAlign='left';
+  const temps=Math.min(a,f.T),voile=fin?Math.max(.25,1-(a-f.T)/900):1;
+  for(const v of f.voies){const tete=Math.floor(temps*v.vit);
+    for(let k=tete;k>=0&&k>tete-f.R;k--){const m=v.b[k%v.b.length],age=(tete-k)/v.vit/1000;
+      fx.fillStyle=k===tete&&!fin?'#c9ffd9':m.fin?`rgba(201,255,217,${voile*Math.max(.3,1-age*.5)})`:`rgba(51,224,106,${voile*Math.max(.1,.85-age*1.1)})`;
+      fx.fillText(m.w+(m.fin?' ✓':''),v.x,((v.dec+k)%f.R)*f.px*1.3)}}
+  // cartouche : compteurs qui montent, puis niveau suivant
+  const gp=22,nb=x=>String(Math.round(x*q)).replace(/\B(?=(\d{3})+$)/g,' ');
+  const lignes=[nb(f.essais)+' essais',nb(f.mots)+' mots atteints',nb(f.pas)+' réécritures'];
+  if(fin)lignes.push('',f.suivant?'↵ '+String(E.niv+2).padStart(2,'0')+' '+f.suivant.nom+'     échap : rester':'dernier niveau');
+  fx.font=`${gp}px "SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace`;
+  const cg=fx.measureText('A').width,lb=(Math.max(34,...lignes.map(l=>l.length))+4)*cg,hb=(6+2)*gp*1.5,bx=(f.W-lb)/2,by=(f.Ht-hb)/2;
+  fx.fillStyle='#020603';fx.fillRect(bx,by,lb,hb);fx.strokeStyle='#33e06a';fx.lineWidth=1;fx.strokeRect(bx+.5,by+.5,lb,hb);
+  fx.fillStyle='#020603';fx.fillRect(bx+cg,by-gp*.6,(niveau().nom.length+5)*cg,gp*1.2);
+  fx.fillStyle='#33e06a';fx.fillText(' '+String(E.niv+1).padStart(2,'0')+' '+niveau().nom,bx+cg,by-gp*.55);
+  lignes.forEach((l,i)=>{fx.fillStyle=i<3?'#c9ffd9':'#33e06a';fx.fillText(l,bx+2*cg,by+(i+1.2)*gp*1.5)});
+  requestAnimationFrame(defiler);
+}
+function finir(avance){if(!fete)return;const s=fete.suivant;fete=null;fc.hidden=true;if(avance&&s)aller(E.niv+1)}
+function aller(i){finir(false);E.niv=i;E.decal={x:0,y:0};choix=null;texte.value=jeu().texte;tout(true);texte.focus()}
+addEventListener('keydown',e=>{if(!fete)return;if(e.key==='Enter'){e.preventDefault();finir(true)}else if(e.key==='Escape')finir(false)},true);
+addEventListener('pointerdown',()=>finir(false),true);
 /* ---------- saisie ---------- */
 const texte=$('texte');let attente=0;
-texte.addEventListener('input',()=>{jeu().texte=texte.value;garde[niveau().id]=texte.value;try{localStorage.setItem('reecriture',JSON.stringify(garde))}catch(e){}clearTimeout(attente);attente=setTimeout(()=>{choix=null;tout(true)},180)});
+texte.addEventListener('input',()=>{jeu().texte=texte.value;garde[niveau().id]=texte.value;try{localStorage.setItem(CLE,JSON.stringify(garde))}catch(e){}clearTimeout(attente);finir(false);attente=setTimeout(()=>{choix=null;tout(true,true)},180)});
 texte.addEventListener('scroll',()=>{$('marge').scrollTop=texte.scrollTop});
-NIVEAUX.forEach((n,i)=>{const b=document.createElement('button');b.textContent=String(i+1).padStart(2,'0');b.setAttribute('aria-label','niveau '+(i+1)+', '+n.nom);if(i&&n.ch!==NIVEAUX[i-1].ch)b.style.marginLeft='3ch';b.onclick=()=>{E.niv=i;E.decal={x:0,y:0};choix=null;texte.value=jeu().texte;tout(true);texte.focus()};$('niveaux').append(b)});
+NIVEAUX.forEach((n,i)=>{const b=document.createElement('button');b.textContent=String(i+1).padStart(2,'0');b.setAttribute('aria-label','niveau '+(i+1)+', '+n.nom);if(i&&n.ch!==NIVEAUX[i-1].ch)b.style.marginLeft='3ch';b.onclick=()=>aller(i);$('niveaux').append(b)});
 function vise(e){const b=cv.getBoundingClientRect(),x=(e.clientX-b.left-plan.ox)/cw,y=e.clientY-b.top-plan.oy;
   for(const n of plan.g.V)if(n.w&&y>=n.d*plan.ph-corps*.3&&y<=n.d*plan.ph+corps*1.4&&x>=n.x-.3&&x<=n.x+n.lw+.3)return{n,k:Math.max(0,Math.min(n.w.length-1,Math.floor(x-n.x)))};return null}
 cv.onpointerdown=e=>{const v=plan&&vise(e);if(!v)return;choix={n:v.n,a:v.k,b:v.k};cv.setPointerCapture(e.pointerId);peindre()};
@@ -174,6 +229,8 @@ cv.addEventListener('wheel',e=>{if(!plan)return;e.preventDefault();
   E.decal.x=Math.max(0,Math.min(Math.max(0,(plan.large+2)*cw-L),E.decal.x+e.deltaX));
   E.decal.y=Math.max(0,Math.min(Math.max(0,plan.etages*plan.ph-H),E.decal.y+e.deltaY));peindre()},{passive:false});
 addEventListener('resize',()=>{mesurer();tout(false)});
+E.jeux.forEach((j,i)=>{if(j.texte){const n=NIVEAUX[i];j.resolu=juger(n,n.imposes.concat(lire(j.texte).regles)).every(x=>x)}});
+E.niv=Math.max(0,E.jeux.findIndex(j=>!j.resolu));
 texte.value=jeu().texte;mesurer();tout(true);texte.focus();
 </script>
 </body>
