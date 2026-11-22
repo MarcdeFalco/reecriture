@@ -46,6 +46,7 @@ main{display:grid;grid-template-columns:minmax(30ch,27%) 14px minmax(0,1fr) 14px
 .t_cmd button{padding:0 1ch}
 .t_cmd button:disabled{color:var(--v3);cursor:default}
 .t_regle{color:var(--v2);padding-left:3ch;font-size:15px}
+.t_redex{background:var(--v3);color:var(--clair);text-shadow:none;border-bottom:2px solid currentColor}
 .t_bon{color:var(--v)}.t_juste{color:var(--clair)}.t_ko{color:var(--r);text-shadow:0 0 6px #ff4b3a66}
 
 #imposes{white-space:pre;color:var(--v2);padding-left:1ch}
@@ -221,8 +222,14 @@ function survoler(m){cv.style.cursor=m?'pointer':'default';if(m===plan.survol)re
 function tracerPas(){const z=$('trace');z.hidden=!chemin;if(!chemin||!plan)return;
   const N=plan.g.N,el=(t,c,txt)=>{const x=document.createElement(t);if(c)x.className=c;x.textContent=txt;return x};z.textContent='';
   const tete=el('div','t_cmd',''),b=el('button','','✕');b.onclick=()=>{chemin=null;tracerPas()};tete.append(b);z.append(tete);
-  for(const c of chemin){const x=N[c.i];if(c.e)z.append(el('div','t_regle',regleTxt(reglesSys[c.e.ri])));
-    z.append(el('div',x.juste?'t_juste':x.bon?'t_bon':'t_ko',(x.w||'·')+issue(x)+(x.boucle?' ∞':'')))}}
+  // étendue du redex dans le mot : pour un terme, p est le rang du nœud, donc de sa lettre
+  const etendue=(w,e)=>{const r=reglesSys[e.ri];if(!r.m)return[e.p,e.p+r.l.length];
+    let a=-1;for(let k=0,v=0;k<w.length;k++)if(/[A-E]/.test(w[k])&&v++===e.p){a=k;break}
+    let b=a+1;if(w[b]==='(')for(let h=0;b<w.length;b++){if(w[b]==='(')h++;else if(w[b]===')'&&!--h){b++;break}}return[a,b]};
+  chemin.forEach((c,k)=>{const x=N[c.i],sv=chemin[k+1];if(c.e)z.append(el('div','t_regle',regleTxt(reglesSys[c.e.ri])));
+    const d=el('div',x.juste?'t_juste':x.bon?'t_bon':'t_ko','');
+    if(sv){const[a,b]=etendue(x.w,sv.e);d.append(x.w.slice(0,a),el('span','t_redex',x.w.slice(a,b)),x.w.slice(b))}
+    else d.textContent=(x.w||'·')+issue(x)+(x.boucle?' ∞':'');z.append(d)})}
 const GLYPHES='ABCDE01<>=/';
 function tracer(t){
   cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cx.clearRect(0,0,L,H);if(!plan)return false;
