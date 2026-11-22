@@ -38,7 +38,16 @@ main{display:grid;grid-template-columns:minmax(30ch,27%) 14px minmax(0,1fr) 14px
 #essais button[aria-pressed=true]{background:var(--v3);color:var(--clair)}
 #essais button.ko[aria-pressed=true]{background:#3a0e0a;color:#ffc9c2}
 #ecran{flex:1;min-height:0;position:relative;overflow:hidden}
-#arbre{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+#arbre{position:absolute;inset:0;width:100%;height:100%}
+#trace{position:absolute;inset:0;background:var(--fond);overflow:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:0 1ch 8px;font-size:18px}
+#trace[hidden]{display:none}
+#trace>*{white-space:pre;flex:none}
+.t_cmd{display:flex;gap:3ch;padding:2px 0 8px;position:sticky;top:0;background:var(--fond);align-self:stretch}
+.t_cmd button{padding:0 1ch}
+.t_cmd button:disabled{color:var(--v3);cursor:default}
+.t_regle{color:var(--v2);padding-left:3ch;font-size:15px}
+.t_bon{color:var(--v)}.t_juste{color:var(--clair)}.t_ko{color:var(--r);text-shadow:0 0 6px #ff4b3a66}
+
 #imposes{white-space:pre;color:var(--v2);padding-left:1ch}
 .saisie{display:grid;grid-template-columns:3ch 1fr;flex:1;min-height:0}
 #marge{white-space:pre;color:var(--v2);overflow:hidden;text-align:right;padding-right:1ch}
@@ -119,7 +128,7 @@ p{margin:0}
 <main>
   <section class="cadre"><h2><span id="t_essais"></span> <span id="compte"></span></h2><div id="essais"></div></section>
   <div class="poignee" data-c="g"></div>
-  <section class="cadre"><h2 id="titre"></h2><div id="ecran"><canvas id="arbre"></canvas></div></section>
+  <section class="cadre"><h2 id="titre"></h2><div id="ecran"><canvas id="arbre"></canvas><div id="trace" hidden></div></div></section>
   <div class="poignee" data-c="d"></div>
   <div class="droite">
     <section class="cadre"><h2 id="nom"></h2><p id="consigne"></p><div id="notions"></div></section>
@@ -243,7 +252,8 @@ const TEXTES={
    "niveau": "niveau",
    "niveaux": "NIVEAUX",
    "casse_tete": "casse-tête",
-   "valider": "valider"
+   "valider": "valider",
+   "pas": "pas à pas"
   },
   "niv": {
    "teinture": [
@@ -466,7 +476,8 @@ const TEXTES={
    "niveau": "level",
    "niveaux": "LEVELS",
    "casse_tete": "puzzles",
-   "valider": "submit"
+   "valider": "submit",
+   "pas": "step"
   },
   "niv": {
    "teinture": [
@@ -689,7 +700,8 @@ const TEXTES={
    "niveau": "nivel",
    "niveaux": "NIVELES",
    "casse_tete": "rompecabezas",
-   "valider": "validar"
+   "valider": "validar",
+   "pas": "paso a paso"
   },
   "niv": {
    "teinture": [
@@ -912,7 +924,8 @@ const TEXTES={
    "niveau": "Level",
    "niveaux": "LEVEL",
    "casse_tete": "Rätsel",
-   "valider": "abgeben"
+   "valider": "abgeben",
+   "pas": "Schritt"
   },
   "niv": {
    "teinture": [
@@ -1161,7 +1174,7 @@ const police=()=>`${corps}px ${POLICE}`;
 function disposer(){
   const n=niveau(),w=n.tests[jeu().sel],g=explorer(w,sys,n.sortie(w),6000,n.lmax),N=g.N,etages=[];
   for(const x of N){(etages[x.d]||(etages[x.d]=[])).push(x);x.bx=0;x.np=0}
-  plan={g,etages,mode:'points',survol:null};
+  plan={g,etages,mode:'points',survol:null,voie:[]};
   if(N.length<=160){let large=0;
     for(const x of N){x.marque=x.juste?' ✓':x.fin?' ✗':x.boucle?' ∞':x.coupe?' …':'';x.lw=Math.max(1,x.w.length);x.l=x.lw+x.marque.length}
     for(const et of etages){et.sort((a,b)=>(a.np?a.bx/a.np:0)-(b.np?b.bx/b.np:0));
@@ -1171,26 +1184,44 @@ function disposer(){
     for(corps=30;corps>=12;corps--){cx.font=police();const c=cx.measureText('A').width;
       if((large+2)*c<=L&&(etages.length*3.4-1.4)*corps<=H){plan.mode='texte';plan.large=large;cw=c;break}}
     if(plan.mode==='points')for(const x of N){x.bx=0;x.np=0}}
-  if(plan.mode==='points'){const haut=40,bas=64,mx=14,ne=etages.length,pasY=Math.min(30,(H-haut-bas)/Math.max(1,ne-1));let serre=16,na=0;
+  if(plan.mode==='points'){const haut=40,bas=64,mx=14,ne=etages.length,pasY=Math.min(72,(H-haut-bas)/Math.max(1,ne-1));let serre=56,na=0;
     const oy=haut+Math.max(0,(H-haut-bas-(ne-1)*pasY)/2);
-    for(const et of etages){et.sort((a,b)=>(a.np?a.bx/a.np:L/2)-(b.np?b.bx/b.np:L/2));const k=et.length,e=Math.min(16,(L-2*mx)/k);serre=Math.min(serre,e);
+    for(const et of etages){et.sort((a,b)=>(a.np?a.bx/a.np:L/2)-(b.np?b.bx/b.np:L/2));const k=et.length,e=Math.min(56,(L-2*mx)/k);serre=Math.min(serre,e);
       et.forEach((x,i)=>{x.px=L/2+(i-(k-1)/2)*e;x.py=oy+x.d*pasY;for(const s of x.succ){const m=N[s.to];if(m.d>x.d){m.bx+=x.px;m.np++;na++}}})}
-    plan.pt=Math.max(1.5,Math.min(7,Math.min(serre,pasY)*.62));plan.na=na;
+    plan.pt=Math.max(1.5,Math.min(9,Math.min(serre,pasY)*.62));plan.na=na;
     const vus=new Set();plan.fins=N.filter(x=>x.fin&&!vus.has(x.w)&&vus.add(x.w)).sort((a,b)=>a.juste-b.juste);
     plan.infini=N.some(x=>x.boucle);plan.coupe=N.some(x=>x.coupe)}
+  const ct=w+'\n'+jeu().texte+'\n'+E.niv;if(chemin&&ct!==cleTrace){chemin=null;tracerPas()}cleTrace=ct;
 }
+/* pas à pas : une dérivation choisie coup par coup dans le graphe de l'essai affiché */
+let chemin=null,reglesSys=[],cleTrace='';
+const regleTxt=r=>r.m?cle(r.m)+' > '+cle(r.r):(r.debut?'^':'')+r.l+(r.fin?'$':'')+' > '+r.r;
+const issue=x=>x.juste?' ✓':x.fin?' ✗':x.coupe?' …':'';
+function voie(n){const N=plan.g.N,but=N.indexOf(n),pred=new Map([[0,null]]),q=[0],c=[];if(but<0)return c;
+  for(let k=0;k<q.length&&!pred.has(but);k++)for(const e of N[q[k]].succ)if(!pred.has(e.to)){pred.set(e.to,{de:q[k],e});q.push(e.to)}
+  for(let i=but;i!==undefined;i=pred.get(i)?pred.get(i).de:undefined)c.unshift({i,e:pred.get(i)&&pred.get(i).e});return c}
+function branche(n){chemin=voie(n);tracerPas()}
+function survoler(m){cv.style.cursor=m?'pointer':'default';if(m===plan.survol)return;plan.survol=m;plan.voie=m?voie(m):[];peindre()}
+function tracerPas(){const z=$('trace');z.hidden=!chemin;if(!chemin||!plan)return;
+  const N=plan.g.N,el=(t,c,txt)=>{const x=document.createElement(t);if(c)x.className=c;x.textContent=txt;return x};z.textContent='';
+  const tete=el('div','t_cmd',''),b=el('button','','✕');b.onclick=()=>{chemin=null;tracerPas()};tete.append(b);z.append(tete);
+  for(const c of chemin){const x=N[c.i];if(c.e)z.append(el('div','t_regle',regleTxt(reglesSys[c.e.ri])));
+    z.append(el('div',x.juste?'t_juste':x.bon?'t_bon':'t_ko',(x.w||'·')+issue(x)+(x.boucle?' ∞':'')))}}
 const GLYPHES='ABCDE01<>=/';
 function tracer(t){
   cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cx.clearRect(0,0,L,H);if(!plan)return false;
   const N=plan.g.N,age=calme?1e9:t-t0,vivant=age<420;cx.textAlign='left';cx.textBaseline='top';
   if(plan.mode==='texte'){const ph=corps*3.4,ox=(L-plan.large*cw)/2,oy=corps*.6;plan.ox=ox;plan.oy=oy;plan.ph=ph;
-    for(const n of N)for(const e of n.succ){const m=N[e.to];if(m.d<=n.d)continue;
-      cx.strokeStyle=!n.bon?'#8a2a22':!m.bon?'#ff4b3a':'#1c7a3c';cx.lineWidth=n.bon&&!m.bon?2:1;
+    const trait=(n,m,gras)=>{if(m.d<=n.d)return;
+      cx.strokeStyle=gras?'#c9ffd9':!n.bon?'#8a2a22':!m.bon?'#ff4b3a':'#1c7a3c';cx.lineWidth=gras?2.5:n.bon&&!m.bon?2:1;
       const x0=ox+(n.x+n.lw/2)*cw,y0=oy+n.d*ph+corps*1.25,x1=ox+(m.x+m.lw/2)*cw,y1=oy+m.d*ph-corps*.2;
       cx.beginPath();cx.moveTo(x0,y0);
-      if(m.d-n.d>1){const b=((n.x+m.x)%2?1:-1)*(Math.max(n.lw,m.lw)/2+1.5+(m.d-n.d))*cw;cx.globalAlpha=.55;cx.bezierCurveTo(x0+b,y0+ph*.6,x1+b,y1-ph*.6,x1,y1)}
+      if(m.d-n.d>1){const b=((n.x+m.x)%2?1:-1)*(Math.max(n.lw,m.lw)/2+1.5+(m.d-n.d))*cw;if(!gras)cx.globalAlpha=.55;cx.bezierCurveTo(x0+b,y0+ph*.6,x1+b,y1-ph*.6,x1,y1)}
       else cx.lineTo(x1,y1);
-      cx.stroke();cx.globalAlpha=1}
+      cx.stroke();cx.globalAlpha=1};
+    for(const n of N)for(const e of n.succ)trait(n,N[e.to],false);
+    const sv=plan.survol;if(sv){const v=plan.voie;for(let k=1;k<v.length;k++)trait(N[v[k-1].i],N[v[k].i],true);
+      cx.strokeStyle='#c9ffd9';cx.lineWidth=1;cx.strokeRect(Math.round(ox+sv.x*cw-5)+.5,Math.round(oy+sv.d*ph-4)+.5,Math.round(sv.l*cw+10),Math.round(corps*1.25+6))}
     cx.font=police();
     N.forEach((n,k)=>{const c=n.juste?'#c9ffd9':(n.fin||n.boucle||n.coupe)?'#ff4b3a':n.bon?'#33e06a':'#a8382d';
       cx.fillStyle=c;cx.shadowColor=c;cx.shadowBlur=corps*.35;
@@ -1207,6 +1238,7 @@ function tracer(t){
   for(const n of N){if(n.d>montre)continue;for(const e of n.succ){const m=N[e.to];if(m.d<=n.d||m.d>montre)continue;
     const k=!n.bon?0:!m.bon?2:1;if(k<2&&!tout)continue;lots[k].p.moveTo(n.px,n.py);lots[k].p.lineTo(m.px,m.py)}}
   for(const{l,p}of lots){cx.strokeStyle=l[0];cx.globalAlpha=l[1];cx.lineWidth=l[2];cx.stroke(p)}cx.globalAlpha=1;
+  if(plan.survol){const v=plan.voie;cx.strokeStyle='#c9ffd9';cx.lineWidth=2;cx.beginPath();v.forEach((c,k)=>{const n=N[c.i];k?cx.lineTo(n.px,n.py):cx.moveTo(n.px,n.py)});cx.stroke()}
   const s=plan.pt;
   for(const n of N){if(n.d>montre)continue;const f=n.fin||n.boucle||n.coupe,c=n.juste?'#c9ffd9':f?'#ff4b3a':n.bon?'#33e06a':'#a8382d',r=f?Math.max(3,s*1.5):s;
     cx.fillStyle=c;if(f){cx.shadowColor=c;cx.shadowBlur=8}cx.fillRect(n.px-r/2,n.py-r/2,r,r);cx.shadowBlur=0}
@@ -1249,7 +1281,7 @@ const nouvelles=()=>NOTIONS.filter(x=>x[1]===niveau().id);
 function titrer(){const n=niveau(),w=n.tests[jeu().sel];$('titre').textContent=w+' → '+(n.sortie(w)||'·')}
 function choisir(i){jeu().sel=i;[...$('essais').children].forEach((b,k)=>b.setAttribute('aria-pressed',k===i));titrer();disposer();t0=performance.now();peindre()}
 function tout(anime,saisie){
-  const n=niveau(),j=jeu(),lu=lire(j.texte,n);sys=systeme(n,n.imposes.concat(lu.regles));trop=lu.lignes>n.max;
+  const n=niveau(),j=jeu(),lu=lire(j.texte,n);reglesSys=n.imposes.concat(lu.regles);sys=systeme(n,reglesSys);trop=lu.lignes>n.max;
   document.documentElement.lang=langue;$('ouvrir').textContent='≡ '+U('niveaux');$('t_essais').textContent=U('essais');$('t_regles').textContent=U('regles_t');$('t_bilan').textContent=U('bilan');
   $('nom').textContent=num(E.niv)+' '+nomDe(n);$('consigne').textContent=TEXTES[langue].niv[n.id][1];
   $('imposes').textContent=n.imposesTxt.map(x=>'▪ '+x.replace('>',' > ')).join('\n');
@@ -1264,7 +1296,7 @@ function tout(anime,saisie){
   const z=$('essais'),lm=Math.max(...n.tests.map(w=>w.length));
   const large=Math.max(...n.tests.map(w=>lm+n.sortie(w).length))+5;
   z.style.gridTemplateColumns=`repeat(auto-fill,minmax(${large}ch,1fr))`;z.textContent='';
-  gaucheAuto=`minmax(30ch,min(42%,max(27%,${large+5}ch)))`;colonnes();
+  gaucheAuto=`minmax(30ch,min(42%,max(27%,${large+5}ch)))`;colonnes();mesurer();
   n.tests.forEach((w,i)=>{const bt=document.createElement('button');bt.dataset.t=w.padEnd(lm)+' → '+(n.sortie(w)||'·');bt.textContent='· '+bt.dataset.t;
     bt.setAttribute('aria-pressed',i===j.sel);bt.onclick=()=>choisir(i);z.append(bt)});
   titrer();disposer();if(anime)t0=performance.now();peindre();juger(saisie);
@@ -1331,7 +1363,7 @@ function aller(i){finir(false);E.niv=i;choix=null;texte.value=jeu().texte;tout(t
 addEventListener('keydown',e=>{if(!fete)return;if(e.key==='Enter'){e.preventDefault();finir(true)}else if(e.key==='Escape')finir(false)},true);
 addEventListener('pointerdown',()=>finir(tactile&&!!fete&&performance.now()-fete.t>=fete.T),true);
 $('ouvrir').onclick=()=>carte($('carte').hidden);
-addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('carte').hidden)carte(false);if(!$('voile').hidden&&(e.key==='Escape'||e.key==='Enter')){e.preventDefault();suite()}});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&chemin){chemin=null;tracerPas()}if(e.key==='Escape'&&!$('carte').hidden)carte(false);if(!$('voile').hidden&&(e.key==='Escape'||e.key==='Enter')){e.preventDefault();suite()}});
 $('voile').onclick=()=>suite();
 /* ---------- saisie ---------- */
 const texte=$('texte');let attente=0;
@@ -1369,16 +1401,15 @@ texte.addEventListener('scroll',()=>{$('marge').scrollTop=texte.scrollTop});
 /* dans la vue en mots : glisser sur un morceau de mot pour en faire un motif ; dans la vue en points : survol */
 function vise(e){const b=cv.getBoundingClientRect(),x=(e.clientX-b.left-plan.ox)/cw,y=e.clientY-b.top-plan.oy;
   for(const n of plan.g.N)if(n.w&&y>=n.d*plan.ph-corps*.3&&y<=n.d*plan.ph+corps*1.4&&x>=n.x-.3&&x<=n.x+n.lw+.3)return{n,k:Math.max(0,Math.min(n.w.length-1,Math.floor(x-n.x)))};return null}
-cv.onpointerdown=e=>{if(!plan||plan.mode!=='texte'||niveau().sig)return;const v=vise(e);if(!v)return;choix={n:v.n,a:v.k,b:v.k};cv.setPointerCapture(e.pointerId);peindre()};
 cv.onpointermove=e=>{if(!plan)return;
   if(plan.mode==='points'){const b=cv.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;let m=null,dm=144;
     for(const n of plan.g.N){const d=(n.px-x)**2+(n.py-y)**2;if(d<dm){dm=d;m=n}}
-    if(m!==plan.survol){plan.survol=m;peindre()}return}
-  if(!choix)return;const v=vise(e);if(v&&v.n===choix.n&&v.k!==choix.b){choix.b=v.k;peindre()}};
-cv.onpointerleave=()=>{if(plan&&plan.survol){plan.survol=null;peindre()}};
-cv.onpointerup=()=>{if(!choix)return;const a=Math.min(choix.a,choix.b),b=Math.max(choix.a,choix.b),l=choix.n.w.slice(a,b+1);choix=null;
-  const v=texte.value;texte.value=v+(v&&!v.endsWith('\n')?'\n':'')+l+' > ';jeu().texte=texte.value;texte.focus();texte.setSelectionRange(texte.value.length,texte.value.length);tout(false)};
+    survoler(m);return}
+  const v=vise(e);survoler(v?v.n:null)};
+cv.onpointerleave=()=>{if(plan)survoler(null)};
+cv.onclick=e=>{if(!plan)return;if(plan.mode==='points'){const b=cv.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;let m=null,dm=400;for(const n of plan.g.N){const d=(n.px-x)**2+(n.py-y)**2;if(d<dm){dm=d;m=n}}if(m)branche(m)}else{const v=vise(e);if(v)branche(v.n)}};
 addEventListener('resize',()=>{mesurer();disposer();peindre()});
+new ResizeObserver(()=>{const b=$('ecran');if(b.clientWidth!==L||b.clientHeight!==H){mesurer();disposer();peindre()}}).observe($('ecran'));
 E.jeux.forEach((j,i)=>{if(j.texte){const n=NIVEAUX[i],lu=lire(j.texte,n),rg=systeme(n,n.imposes.concat(lu.regles));j.resolu=lu.lignes<=n.max&&n.tests.every(w=>verdict(w,rg,n.sortie(w),6000,n.lmax))}});
 E.niv=Math.max(0,NIVEAUX.findIndex(n=>!faits.has(n.id)));texte.value=jeu().texte;mesurer();tout(true);carte(true);
 </script>

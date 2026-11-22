@@ -19,7 +19,8 @@
    "niveau": "niveau",
    "niveaux": "NIVEAUX",
    "casse_tete": "casse-tête",
-   "valider": "valider"
+   "valider": "valider",
+   "pas": "pas à pas"
   },
   "niv": {
    "teinture": [
@@ -242,7 +243,8 @@
    "niveau": "level",
    "niveaux": "LEVELS",
    "casse_tete": "puzzles",
-   "valider": "submit"
+   "valider": "submit",
+   "pas": "step"
   },
   "niv": {
    "teinture": [
@@ -465,7 +467,8 @@
    "niveau": "nivel",
    "niveaux": "NIVELES",
    "casse_tete": "rompecabezas",
-   "valider": "validar"
+   "valider": "validar",
+   "pas": "paso a paso"
   },
   "niv": {
    "teinture": [
@@ -688,7 +691,8 @@
    "niveau": "Level",
    "niveaux": "LEVEL",
    "casse_tete": "Rätsel",
-   "valider": "abgeben"
+   "valider": "abgeben",
+   "pas": "Schritt"
   },
   "niv": {
    "teinture": [
