@@ -77,6 +77,34 @@ textarea::placeholder{color:var(--v3)}
 #panneau button{align-self:end;color:var(--clair)}
 #carte button:hover,#carte button[aria-current=true]{background:var(--v3);color:var(--clair)}
 p{margin:0}
+#touches{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;margin-top:10px}
+#touches[hidden]{display:none}
+#touches button{height:42px;border:1px solid var(--v2);color:var(--clair);text-align:center;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#touches button:active{background:var(--v3)}
+@media (max-width:820px){
+  html,body{height:auto;min-height:100%}
+  body{display:block;overflow:auto;padding:10px 10px 24px}
+  header{justify-content:space-between;margin-bottom:18px}
+  #niveaux{display:none}
+  main{display:flex;flex-direction:column;gap:20px}
+  .droite{display:contents}
+  .droite>section:nth-child(1){order:1}
+  main>section:nth-child(2){order:2}
+  .droite>section:nth-child(2){order:3}
+  .droite>section:nth-child(3){order:4}
+  main>section:nth-child(1){order:5}
+  #ecran{flex:none;height:min(38vh,320px)}
+  textarea{min-height:7.5em}
+  #essais{max-height:45vh}
+  #carte{padding:18px 12px 30px}
+  #c_tete{grid-template-columns:1fr;margin-bottom:24px}
+  #c_tete h1{font-size:22px;letter-spacing:.2em}
+  #c_langues{grid-column:1;grid-row:auto}
+  #c_grille{grid-template-columns:1fr}
+  #carte button{padding:4px 0}
+  #panneau{padding:22px 2ch 14px}
+  #panneau pre{font-size:15px;overflow-x:auto;white-space:pre}
+}
 </style>
 </head>
 <body>
@@ -87,7 +115,7 @@ p{margin:0}
   <div class="droite">
     <section class="cadre"><h2 id="nom"></h2><p id="consigne"></p><div id="notions"></div></section>
     <section class="cadre"><h2 id="t_regles"></h2><div id="imposes"></div><div class="saisie"><div id="marge" aria-hidden="true"></div>
-      <textarea id="texte" spellcheck="false" autocapitalize="characters" placeholder="AA > B"></textarea></div><p id="aide"></p></section>
+      <textarea id="texte" spellcheck="false" autocapitalize="characters" placeholder="AA > B"></textarea></div><div id="touches" hidden></div><p id="aide"></p></section>
     <section class="cadre"><h2 id="t_bilan"></h2><p id="bilan"></p></section>
   </div>
 </main>
@@ -238,7 +266,7 @@ function tout(anime,saisie){
   $('imposes').textContent=n.imposesTxt.map(x=>'▪ '+x.replace('>',' > ')).join('\n');
   $('marge').innerHTML=j.texte.split('\n').map((_,i)=>lu.fautes.includes(i)?'<span class="ko">?</span>':String(i+1)).join('\n');
   const forme=c=>n.sig?['',c+'(·)',c+'(·,·)'][n.sig[c]]||c:c;
-  $('aide').textContent=[[...n.alphabet].sort().map(forme).join(' ')].concat(n.sig?['x y z']:[],n.ancrages?['^ $']:[],n.jokers?['1 2 = '+[...n.jokers].join(' ')]:[]).join('   ');
+  clavier();$('aide').textContent=[[...n.alphabet].sort().map(forme).join(' ')].concat(n.sig?['x y z']:[],n.ancrages?['^ $']:[],n.jokers?['1 2 = '+[...n.jokers].join(' ')]:[]).join('   ');
   texte.style.textTransform=n.sig?'none':'';texte.placeholder=n.sig?'C(x,A) > x':'AA > B';
   const zn=$('notions');zn.textContent='';for(const x of nouvelles()){const k=document.createElement('button');k.textContent='? '+x[2];k.onclick=()=>panneau([x]);zn.append(k)}
   const b=$('bilan');b.textContent=lu.lignes+' '+U(lu.lignes>1?'regles':'regle')+', '+lu.symboles+' '+U('symboles');
@@ -295,7 +323,7 @@ function defiler(t){
       fx.fillStyle=k===tete&&!fin?'#c9ffd9':m.fin?`rgba(201,255,217,${voile*Math.max(.3,1-age*.5)})`:`rgba(51,224,106,${voile*Math.max(.1,.85-age*1.1)})`;
       fx.fillText(m.w+(m.fin?' ✓':''),v.x,((v.dec+k)%f.R)*f.px*1.3)}}
   // cartouche : compteurs qui montent, puis niveau suivant
-  const gp=22,nb=x=>String(Math.round(x*q)).replace(/\B(?=(\d{3})+$)/g,' '),nom=num(E.niv)+' '+nomDe(niveau());
+  const gp=Math.min(22,Math.floor((f.W-16)/23)),nb=x=>String(Math.round(x*q)).replace(/\B(?=(\d{3})+$)/g,' '),nom=num(E.niv)+' '+nomDe(niveau());
   const lignes=[nb(f.essais)+' '+U('f_essais'),nb(f.mots)+' '+U('f_mots'),nb(f.pas)+' '+U('f_pas')];
   if(fin)lignes.push('',f.suivant?'↵ '+num(E.niv+1)+' '+nomDe(NIVEAUX[E.niv+1])+'     '+U('rester'):U('dernier'));
   fx.font=`${gp}px ${POLICE}`;
@@ -309,12 +337,21 @@ function defiler(t){
 function finir(avance){if(!fete)return;const s=fete.suivant;fete=null;fc.hidden=true;if(avance&&s)aller(E.niv+1)}
 function aller(i){finir(false);E.niv=i;choix=null;texte.value=jeu().texte;tout(true);texte.focus();const a=nouvelles().filter(x=>!vus.has(x[0]));if(a.length)panneau(a)}
 addEventListener('keydown',e=>{if(!fete)return;if(e.key==='Enter'){e.preventDefault();finir(true)}else if(e.key==='Escape')finir(false)},true);
-addEventListener('pointerdown',()=>finir(false),true);
+addEventListener('pointerdown',()=>finir(tactile&&!!fete&&performance.now()-fete.t>=fete.T),true);
 $('ouvrir').onclick=()=>carte($('carte').hidden);
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('carte').hidden)carte(false);if(!$('voile').hidden&&(e.key==='Escape'||e.key==='Enter')){e.preventDefault();suite()}});
 $('voile').onclick=()=>suite();
 /* ---------- saisie ---------- */
 const texte=$('texte');let attente=0;
+/* écran tactile : les touches du niveau remplacent le clavier du téléphone */
+const tactile=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;if(tactile)texte.inputMode='none';
+function clavier(){const z=$('touches'),n=niveau();z.hidden=!tactile;if(!tactile)return;z.textContent='';
+  const k=[...n.alphabet].sort().concat(['>'],n.sig?['(',',',')','x','y','z']:[],n.ancrages?['^','$']:[],n.jokers?['1','2']:[],['↵','⌫']);
+  for(const c of k){const b=document.createElement('button');b.textContent=c;b.onpointerdown=e=>{e.preventDefault();frapper(c)};z.append(b)}}
+function frapper(c){const a=texte.selectionStart,b=texte.selectionEnd,v=texte.value;texte.focus();
+  if(c==='⌫'){const d=a===b?Math.max(0,a-1):a;texte.value=v.slice(0,d)+v.slice(b);texte.setSelectionRange(d,d)}
+  else{const t=c==='↵'?'\n':c==='>'?' > ':c;texte.value=v.slice(0,a)+t+v.slice(b);texte.setSelectionRange(a+t.length,a+t.length)}
+  texte.dispatchEvent(new Event('input'))}
 texte.addEventListener('input',()=>{if(niveau().sig){const a=texte.selectionStart,b=texte.selectionEnd,v=texte.value.replace(/[a-e]/g,c=>c.toUpperCase()).replace(/[XYZ]/g,c=>c.toLowerCase());if(v!==texte.value){texte.value=v;texte.setSelectionRange(a,b)}}
   jeu().texte=texte.value;garde[niveau().id]=texte.value;ecrit(CLE,JSON.stringify(garde));clearTimeout(attente);finir(false);attente=setTimeout(()=>{choix=null;tout(true,true)},180)});
 texte.addEventListener('scroll',()=>{$('marge').scrollTop=texte.scrollTop});
