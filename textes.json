@@ -1,0 +1,1078 @@
+{
+"fr": {
+"nom": "Français",
+"ui": {
+"essais": "ESSAIS",
+"regles_t": "RÈGLES",
+"bilan": "BILAN",
+"regle": "règle",
+"regles": "règles",
+"symboles": "symboles",
+"max": "{n} au plus",
+"mots": "mots",
+"etages": "étapes au plus",
+"f_essais": "essais",
+"f_mots": "mots atteints",
+"f_pas": "réécritures",
+"rester": "échap : rester",
+"dernier": "dernier niveau",
+"niveau": "niveau",
+"niveaux": "NIVEAUX",
+"casse_tete": "casse-tête"
+},
+"niv": {
+"teinture": [
+"Teinture",
+"A devient B."
+],
+"filtre": [
+"Filtre",
+"Effacer les B."
+],
+"tri": [
+"Tri",
+"Les A devant."
+],
+"compression": [
+"Compression",
+"Pas deux fois la même lettre de suite."
+],
+"annulation": [
+"Annulation",
+"A et B s'annulent."
+],
+"drapeau": [
+"Drapeau",
+"A, puis B, puis C."
+],
+"moitie": [
+"Moitié",
+"Deux A font un B. Le reste devant."
+],
+"inventaire": [
+"Inventaire",
+"Un A s'il y en a, un B s'il y en a."
+],
+"pile-ou-face": [
+"Pile ou face",
+"B si les B sont impairs. Sinon A."
+],
+"peinture-verte": [
+"Peinture",
+"B devient C. Les A devant."
+],
+"convoyeur": [
+"Convoyeur",
+"A et B s'annulent."
+],
+"fusion": [
+"Fusion",
+"A et B fondent en C. Les C devant."
+],
+"reduction": [
+"Réduction",
+"A contre B s'annulent. C contre D aussi."
+],
+"compte-de-trois": [
+"Compte de trois",
+"A = 1, B = 2. Le reste par trois."
+],
+"monnaie": [
+"Monnaie",
+"A = 1, B = 2, C = 4. Le moins de lettres."
+],
+"couture": [
+"Couture",
+"Retirer le C."
+],
+"negatif": [
+"Négatif",
+"Échanger A et B. Le C s'en va."
+],
+"doubleur": [
+"Doubleur",
+"Doubler les A. Le C s'en va."
+],
+"soustraction": [
+"Soustraction",
+"Gauche moins droite. Le C s'en va."
+],
+"parite": [
+"Parité",
+"Un B si les A sont impairs."
+],
+"difference": [
+"Différence",
+"L'écart autour du C. En A si la gauche gagne, en B sinon."
+],
+"premier-cube": [
+"Le premier",
+"Garder le premier B."
+],
+"comparaison": [
+"Comparaison",
+"Plus de A à gauche : A. À droite : B."
+],
+"motif": [
+"Motif",
+"Un C s'il y a BAB."
+],
+"parentheses": [
+"Parenthèses",
+"A ouvre, B ferme. Un C si ça ne ferme pas."
+],
+"fermeture-eclair": [
+"Fermeture éclair",
+"Alterner A et B."
+],
+"milieu": [
+"Milieu",
+"A devient B. Un C au milieu."
+],
+"copie": [
+"Copie",
+"Recopier les A après le D."
+],
+"increment": [
+"Incrément",
+"Binaire, B = 1, A = 0. Ajouter un."
+],
+"decrement": [
+"Décrément",
+"Binaire, B = 1, A = 0. Retirer un."
+],
+"trois": [
+"Trois",
+"Binaire, B = 1, A = 0. Reste par trois : D, C ou E."
+],
+"ronds-binaire": [
+"Unaire → binaire",
+"Compter les A en binaire. B = 1, C = 0."
+],
+"puissance-de-deux": [
+"Puissance de deux",
+"Binaire, B = 1, C = 0. Autant de A."
+],
+"binaire-ronds": [
+"Binaire → unaire",
+"Binaire, B = 1, C = 0. Autant de A."
+],
+"multiplication": [
+"Multiplication",
+"Autant de C que A fois B."
+],
+"tripler": [
+"Tripler",
+"Binaire, B = 1, A = 0. Le triple, C = 1."
+],
+"rognures": [
+"Rognures",
+"Retirer les B des bouts."
+],
+"sentinelles": [
+"Sentinelles",
+"Un D à chaque bout."
+],
+"compteur": [
+"Compteur",
+"Binaire, B = 1, A = 0. Ajouter un. Finir par D."
+],
+"jumelles": [
+"Jumelles",
+"Pas deux fois la même lettre de suite. Une règle."
+],
+"rotation": [
+"Rotation",
+"La première lettre passe à la fin."
+],
+"miroir": [
+"Miroir",
+"Le mot à l'envers."
+],
+"copie-libre": [
+"Copie libre",
+"Recopier le mot après le D."
+],
+"reflet": [
+"Reflet",
+"Tout retourner."
+],
+"compter": [
+"Compter",
+"Un E par C."
+],
+"hauteur": [
+"Hauteur",
+"Un E par C de la plus longue branche."
+],
+"feuilles": [
+"Feuilles",
+"A devient B."
+],
+"gauche": [
+"Gauche",
+"Garder la feuille de gauche."
+],
+"elagage": [
+"Élagage",
+"Retirer les B."
+],
+"echange": [
+"Échange",
+"Échanger les deux branches."
+],
+"peigne": [
+"Peigne",
+"Tout pencher à droite."
+],
+"addition": [
+"Addition",
+"D additionne."
+],
+"comparer": [
+"Comparer",
+"Gauche ≤ droite : A. Sinon B."
+],
+"ecart": [
+"Écart",
+"L'écart entre gauche et droite."
+],
+"recenser": [
+"Recensement",
+"Un E par B."
+],
+"distribuer": [
+"Distribuer",
+"C multiplie, D additionne. Développer."
+],
+"developper": [
+"Développer",
+"Développer. Produits penchés à droite."
+],
+"tete": [
+"Tête",
+"Garder la première lettre. Une règle."
+],
+"echo": [
+"Écho",
+"Doubler chaque lettre."
+]
+},
+"chapitres": [
+"Début",
+"Ordre",
+"Navettes",
+"Messagers",
+"Calcul",
+"Bords",
+"Termes"
+]
+},
+"en": {
+"nom": "English",
+"ui": {
+"essais": "TESTS",
+"regles_t": "RULES",
+"bilan": "SUMMARY",
+"regle": "rule",
+"regles": "rules",
+"symboles": "symbols",
+"max": "{n} at most",
+"mots": "words",
+"etages": "steps at most",
+"f_essais": "tests",
+"f_mots": "words reached",
+"f_pas": "rewrites",
+"rester": "esc: stay",
+"dernier": "last level",
+"niveau": "level",
+"niveaux": "LEVELS",
+"casse_tete": "puzzles"
+},
+"niv": {
+"teinture": [
+"Dye",
+"A becomes B."
+],
+"filtre": [
+"Filter",
+"Erase the B's."
+],
+"tri": [
+"Sort",
+"A's first."
+],
+"compression": [
+"Squeeze",
+"Never the same letter twice in a row."
+],
+"annulation": [
+"Cancel",
+"A and B cancel."
+],
+"drapeau": [
+"Flag",
+"A, then B, then C."
+],
+"moitie": [
+"Half",
+"Two A's make a B. Leftover in front."
+],
+"inventaire": [
+"Inventory",
+"One A if any, one B if any."
+],
+"pile-ou-face": [
+"Heads or tails",
+"B if the B's are odd. Otherwise A."
+],
+"peinture-verte": [
+"Paint",
+"B becomes C. A's first."
+],
+"convoyeur": [
+"Conveyor",
+"A and B cancel."
+],
+"fusion": [
+"Fusion",
+"A and B melt into C. C's first."
+],
+"reduction": [
+"Reduction",
+"A against B cancel. C against D too."
+],
+"compte-de-trois": [
+"Count of three",
+"A = 1, B = 2. Remainder by three."
+],
+"monnaie": [
+"Change",
+"A = 1, B = 2, C = 4. Fewest letters."
+],
+"couture": [
+"Seam",
+"Remove the C."
+],
+"negatif": [
+"Negative",
+"Swap A and B. The C goes."
+],
+"doubleur": [
+"Doubler",
+"Double the A's. The C goes."
+],
+"soustraction": [
+"Subtraction",
+"Left minus right. The C goes."
+],
+"parite": [
+"Parity",
+"One B if the A's are odd."
+],
+"difference": [
+"Difference",
+"The gap around the C. In A's if left wins, in B's otherwise."
+],
+"premier-cube": [
+"The first",
+"Keep the first B."
+],
+"comparaison": [
+"Comparison",
+"More A's on the left: A. On the right: B."
+],
+"motif": [
+"Pattern",
+"A C if there is BAB."
+],
+"parentheses": [
+"Brackets",
+"A opens, B closes. A C if it doesn't close."
+],
+"fermeture-eclair": [
+"Zipper",
+"Alternate A and B."
+],
+"milieu": [
+"Middle",
+"A becomes B. A C in the middle."
+],
+"copie": [
+"Copy",
+"Copy the A's after the D."
+],
+"increment": [
+"Increment",
+"Binary, B = 1, A = 0. Add one."
+],
+"decrement": [
+"Decrement",
+"Binary, B = 1, A = 0. Subtract one."
+],
+"trois": [
+"Three",
+"Binary, B = 1, A = 0. Remainder by three: D, C or E."
+],
+"ronds-binaire": [
+"Unary → binary",
+"Count the A's in binary. B = 1, C = 0."
+],
+"puissance-de-deux": [
+"Power of two",
+"Binary, B = 1, C = 0. As many A's."
+],
+"binaire-ronds": [
+"Binary → unary",
+"Binary, B = 1, C = 0. As many A's."
+],
+"multiplication": [
+"Multiplication",
+"As many C's as A times B."
+],
+"tripler": [
+"Triple",
+"Binary, B = 1, A = 0. Triple it, C = 1."
+],
+"rognures": [
+"Trimmings",
+"Remove the B's at the ends."
+],
+"sentinelles": [
+"Sentinels",
+"A D at each end."
+],
+"compteur": [
+"Counter",
+"Binary, B = 1, A = 0. Add one. End with D."
+],
+"jumelles": [
+"Twins",
+"Never the same letter twice in a row. One rule."
+],
+"rotation": [
+"Rotation",
+"First letter goes last."
+],
+"miroir": [
+"Mirror",
+"The word backwards."
+],
+"copie-libre": [
+"Free copy",
+"Copy the word after the D."
+],
+"reflet": [
+"Reflection",
+"Flip everything."
+],
+"compter": [
+"Count",
+"One E per C."
+],
+"hauteur": [
+"Height",
+"One E per C on the longest branch."
+],
+"feuilles": [
+"Leaves",
+"A becomes B."
+],
+"gauche": [
+"Left",
+"Keep the left leaf."
+],
+"elagage": [
+"Pruning",
+"Remove the B's."
+],
+"echange": [
+"Swap",
+"Swap the two branches."
+],
+"peigne": [
+"Comb",
+"Lean everything right."
+],
+"addition": [
+"Addition",
+"D adds."
+],
+"comparer": [
+"Compare",
+"Left ≤ right: A. Otherwise B."
+],
+"ecart": [
+"Gap",
+"The gap between left and right."
+],
+"recenser": [
+"Census",
+"One E per B."
+],
+"distribuer": [
+"Distribute",
+"C multiplies, D adds. Expand."
+],
+"developper": [
+"Expand",
+"Expand. Products leaning right."
+],
+"tete": [
+"Head",
+"Keep the first letter. One rule."
+],
+"echo": [
+"Echo",
+"Double every letter."
+]
+},
+"chapitres": [
+"Start",
+"Order",
+"Shuttles",
+"Messengers",
+"Arithmetic",
+"Edges",
+"Terms"
+]
+},
+"es": {
+"nom": "Español",
+"ui": {
+"essais": "PRUEBAS",
+"regles_t": "REGLAS",
+"bilan": "BALANCE",
+"regle": "regla",
+"regles": "reglas",
+"symboles": "símbolos",
+"max": "{n} como máximo",
+"mots": "palabras",
+"etages": "pasos como máximo",
+"f_essais": "pruebas",
+"f_mots": "palabras alcanzadas",
+"f_pas": "reescrituras",
+"rester": "esc: quedarse",
+"dernier": "último nivel",
+"niveau": "nivel",
+"niveaux": "NIVELES",
+"casse_tete": "rompecabezas"
+},
+"niv": {
+"teinture": [
+"Tinte",
+"A pasa a B."
+],
+"filtre": [
+"Filtro",
+"Borrar las B."
+],
+"tri": [
+"Orden",
+"Las A delante."
+],
+"compression": [
+"Compresión",
+"Nunca la misma letra dos veces seguidas."
+],
+"annulation": [
+"Anulación",
+"A y B se anulan."
+],
+"drapeau": [
+"Bandera",
+"A, luego B, luego C."
+],
+"moitie": [
+"Mitad",
+"Dos A hacen una B. El resto delante."
+],
+"inventaire": [
+"Inventario",
+"Una A si hay, una B si hay."
+],
+"pile-ou-face": [
+"Cara o cruz",
+"B si las B son impares. Si no, A."
+],
+"peinture-verte": [
+"Pintura",
+"B pasa a C. Las A delante."
+],
+"convoyeur": [
+"Cinta",
+"A y B se anulan."
+],
+"fusion": [
+"Fusión",
+"A y B se funden en C. Las C delante."
+],
+"reduction": [
+"Reducción",
+"A contra B se anulan. C contra D también."
+],
+"compte-de-trois": [
+"Cuenta de tres",
+"A = 1, B = 2. El resto entre tres."
+],
+"monnaie": [
+"Cambio",
+"A = 1, B = 2, C = 4. El mínimo de letras."
+],
+"couture": [
+"Costura",
+"Quitar la C."
+],
+"negatif": [
+"Negativo",
+"Intercambiar A y B. La C se va."
+],
+"doubleur": [
+"Duplicador",
+"Duplicar las A. La C se va."
+],
+"soustraction": [
+"Resta",
+"Izquierda menos derecha. La C se va."
+],
+"parite": [
+"Paridad",
+"Una B si las A son impares."
+],
+"difference": [
+"Diferencia",
+"La diferencia en torno a la C. En A si gana la izquierda, en B si no."
+],
+"premier-cube": [
+"La primera",
+"Dejar la primera B."
+],
+"comparaison": [
+"Comparación",
+"Más A a la izquierda: A. A la derecha: B."
+],
+"motif": [
+"Patrón",
+"Una C si hay BAB."
+],
+"parentheses": [
+"Paréntesis",
+"A abre, B cierra. Una C si no cierra."
+],
+"fermeture-eclair": [
+"Cremallera",
+"Alternar A y B."
+],
+"milieu": [
+"Centro",
+"A pasa a B. Una C en el centro."
+],
+"copie": [
+"Copia",
+"Copiar las A tras la D."
+],
+"increment": [
+"Incremento",
+"Binario, B = 1, A = 0. Sumar uno."
+],
+"decrement": [
+"Decremento",
+"Binario, B = 1, A = 0. Restar uno."
+],
+"trois": [
+"Tres",
+"Binario, B = 1, A = 0. Resto entre tres: D, C o E."
+],
+"ronds-binaire": [
+"Unario → binario",
+"Contar las A en binario. B = 1, C = 0."
+],
+"puissance-de-deux": [
+"Potencia de dos",
+"Binario, B = 1, C = 0. Otras tantas A."
+],
+"binaire-ronds": [
+"Binario → unario",
+"Binario, B = 1, C = 0. Otras tantas A."
+],
+"multiplication": [
+"Multiplicación",
+"Tantas C como A por B."
+],
+"tripler": [
+"Triple",
+"Binario, B = 1, A = 0. El triple, C = 1."
+],
+"rognures": [
+"Recortes",
+"Quitar las B de los extremos."
+],
+"sentinelles": [
+"Centinelas",
+"Una D en cada extremo."
+],
+"compteur": [
+"Contador",
+"Binario, B = 1, A = 0. Sumar uno. Terminar con D."
+],
+"jumelles": [
+"Gemelas",
+"Nunca la misma letra dos veces seguidas. Una regla."
+],
+"rotation": [
+"Rotación",
+"La primera letra pasa al final."
+],
+"miroir": [
+"Espejo",
+"La palabra al revés."
+],
+"copie-libre": [
+"Copia libre",
+"Copiar la palabra tras la D."
+],
+"reflet": [
+"Reflejo",
+"Voltear todo."
+],
+"compter": [
+"Contar",
+"Una E por C."
+],
+"hauteur": [
+"Altura",
+"Una E por C de la rama más larga."
+],
+"feuilles": [
+"Hojas",
+"A pasa a B."
+],
+"gauche": [
+"Izquierda",
+"Dejar la hoja de la izquierda."
+],
+"elagage": [
+"Poda",
+"Quitar las B."
+],
+"echange": [
+"Intercambio",
+"Intercambiar las dos ramas."
+],
+"peigne": [
+"Peine",
+"Inclinar todo a la derecha."
+],
+"addition": [
+"Suma",
+"D suma."
+],
+"comparer": [
+"Comparar",
+"Izquierda ≤ derecha: A. Si no, B."
+],
+"ecart": [
+"Distancia",
+"La diferencia entre izquierda y derecha."
+],
+"recenser": [
+"Censo",
+"Una E por B."
+],
+"distribuer": [
+"Distribuir",
+"C multiplica, D suma. Desarrollar."
+],
+"developper": [
+"Desarrollar",
+"Desarrollar. Productos inclinados a la derecha."
+],
+"tete": [
+"Cabeza",
+"Dejar la primera letra. Una regla."
+],
+"echo": [
+"Eco",
+"Duplicar cada letra."
+]
+},
+"chapitres": [
+"Inicio",
+"Orden",
+"Lanzaderas",
+"Mensajeros",
+"Cálculo",
+"Bordes",
+"Términos"
+]
+},
+"de": {
+"nom": "Deutsch",
+"ui": {
+"essais": "TESTS",
+"regles_t": "REGELN",
+"bilan": "BILANZ",
+"regle": "Regel",
+"regles": "Regeln",
+"symboles": "Zeichen",
+"max": "höchstens {n}",
+"mots": "Wörter",
+"etages": "Schritte höchstens",
+"f_essais": "Tests",
+"f_mots": "erreichte Wörter",
+"f_pas": "Ersetzungen",
+"rester": "Esc: bleiben",
+"dernier": "letztes Level",
+"niveau": "Level",
+"niveaux": "LEVEL",
+"casse_tete": "Rätsel"
+},
+"niv": {
+"teinture": [
+"Färben",
+"A wird B."
+],
+"filtre": [
+"Filter",
+"Die B löschen."
+],
+"tri": [
+"Sortieren",
+"Die A nach vorn."
+],
+"compression": [
+"Stauchen",
+"Nie derselbe Buchstabe zweimal hintereinander."
+],
+"annulation": [
+"Aufheben",
+"A und B heben sich auf."
+],
+"drapeau": [
+"Flagge",
+"A, dann B, dann C."
+],
+"moitie": [
+"Hälfte",
+"Zwei A ergeben ein B. Der Rest nach vorn."
+],
+"inventaire": [
+"Inventar",
+"Ein A, falls vorhanden, ein B, falls vorhanden."
+],
+"pile-ou-face": [
+"Kopf oder Zahl",
+"B, wenn die B ungerade sind. Sonst A."
+],
+"peinture-verte": [
+"Anstrich",
+"B wird C. Die A nach vorn."
+],
+"convoyeur": [
+"Förderband",
+"A und B heben sich auf."
+],
+"fusion": [
+"Fusion",
+"A und B verschmelzen zu C. Die C nach vorn."
+],
+"reduction": [
+"Reduktion",
+"A gegen B hebt sich auf. C gegen D auch."
+],
+"compte-de-trois": [
+"Dreierzählung",
+"A = 1, B = 2. Rest durch drei."
+],
+"monnaie": [
+"Wechselgeld",
+"A = 1, B = 2, C = 4. Möglichst wenige Buchstaben."
+],
+"couture": [
+"Naht",
+"Das C entfernen."
+],
+"negatif": [
+"Negativ",
+"A und B tauschen. Das C geht."
+],
+"doubleur": [
+"Verdoppler",
+"Die A verdoppeln. Das C geht."
+],
+"soustraction": [
+"Subtraktion",
+"Links minus rechts. Das C geht."
+],
+"parite": [
+"Parität",
+"Ein B, wenn die A ungerade sind."
+],
+"difference": [
+"Differenz",
+"Der Abstand um das C. Als A, wenn links gewinnt, sonst als B."
+],
+"premier-cube": [
+"Das erste",
+"Das erste B behalten."
+],
+"comparaison": [
+"Vergleich",
+"Mehr A links: A. Rechts: B."
+],
+"motif": [
+"Muster",
+"Ein C, wenn BAB vorkommt."
+],
+"parentheses": [
+"Klammern",
+"A öffnet, B schließt. Ein C, wenn es nicht aufgeht."
+],
+"fermeture-eclair": [
+"Reißverschluss",
+"A und B abwechseln."
+],
+"milieu": [
+"Mitte",
+"A wird B. Ein C in die Mitte."
+],
+"copie": [
+"Kopie",
+"Die A hinter das D kopieren."
+],
+"increment": [
+"Inkrement",
+"Binär, B = 1, A = 0. Eins dazu."
+],
+"decrement": [
+"Dekrement",
+"Binär, B = 1, A = 0. Eins weg."
+],
+"trois": [
+"Drei",
+"Binär, B = 1, A = 0. Rest durch drei: D, C oder E."
+],
+"ronds-binaire": [
+"Unär → binär",
+"Die A binär zählen. B = 1, C = 0."
+],
+"puissance-de-deux": [
+"Zweierpotenz",
+"Binär, B = 1, C = 0. Ebenso viele A."
+],
+"binaire-ronds": [
+"Binär → unär",
+"Binär, B = 1, C = 0. Ebenso viele A."
+],
+"multiplication": [
+"Multiplikation",
+"So viele C wie A mal B."
+],
+"tripler": [
+"Verdreifachen",
+"Binär, B = 1, A = 0. Das Dreifache, C = 1."
+],
+"rognures": [
+"Verschnitt",
+"Die B an den Enden entfernen."
+],
+"sentinelles": [
+"Wächter",
+"Ein D an jedes Ende."
+],
+"compteur": [
+"Zähler",
+"Binär, B = 1, A = 0. Eins dazu. Mit D enden."
+],
+"jumelles": [
+"Zwillinge",
+"Nie derselbe Buchstabe zweimal hintereinander. Eine Regel."
+],
+"rotation": [
+"Rotation",
+"Der erste Buchstabe ans Ende."
+],
+"miroir": [
+"Spiegel",
+"Das Wort rückwärts."
+],
+"copie-libre": [
+"Freie Kopie",
+"Das Wort hinter das D kopieren."
+],
+"reflet": [
+"Spiegelung",
+"Alles umdrehen."
+],
+"compter": [
+"Zählen",
+"Ein E pro C."
+],
+"hauteur": [
+"Höhe",
+"Ein E pro C auf dem längsten Ast."
+],
+"feuilles": [
+"Blätter",
+"A wird B."
+],
+"gauche": [
+"Links",
+"Das linke Blatt behalten."
+],
+"elagage": [
+"Rückschnitt",
+"Die B entfernen."
+],
+"echange": [
+"Tausch",
+"Die beiden Äste tauschen."
+],
+"peigne": [
+"Kamm",
+"Alles nach rechts neigen."
+],
+"addition": [
+"Addition",
+"D addiert."
+],
+"comparer": [
+"Vergleichen",
+"Links ≤ rechts: A. Sonst B."
+],
+"ecart": [
+"Abstand",
+"Der Abstand zwischen links und rechts."
+],
+"recenser": [
+"Zählung",
+"Ein E pro B."
+],
+"distribuer": [
+"Ausmultiplizieren",
+"C multipliziert, D addiert. Ausmultiplizieren."
+],
+"developper": [
+"Entwickeln",
+"Ausmultiplizieren. Produkte nach rechts geneigt."
+],
+"tete": [
+"Kopf",
+"Den ersten Buchstaben behalten. Eine Regel."
+],
+"echo": [
+"Echo",
+"Jeden Buchstaben verdoppeln."
+]
+},
+"chapitres": [
+"Start",
+"Reihenfolge",
+"Schiffchen",
+"Boten",
+"Rechnen",
+"Ränder",
+"Terme"
+]
+}
+}

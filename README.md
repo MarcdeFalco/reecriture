@@ -12,5 +12,5 @@ Le jeu est une page statique : `index.html`.
 
     python3 construire.py
 
-assemble `gabarit.html` (interface et moteur), `niveaux.json` (niveaux et essais) et
-`consignes.json` (textes des consignes).
+assemble `gabarit.html` (interface), `moteur.js` (moteur), `niveaux.json` (niveaux et essais) et
+`textes.json` (noms, consignes et interface, par langue).
