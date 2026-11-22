@@ -24,7 +24,10 @@ header{display:flex;gap:2ch;align-items:start}
 #langues svg{display:block;width:100%;height:100%}
 button{font:inherit;color:inherit;text-shadow:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
 button:focus-visible{outline:1px solid var(--clair);outline-offset:2px}
-main{display:grid;grid-template-columns:minmax(30ch,27%) 1fr 36ch;gap:14px;min-height:0}
+main{display:grid;grid-template-columns:minmax(30ch,27%) 14px minmax(0,1fr) 14px 36ch;min-height:0}
+.poignee{cursor:col-resize;touch-action:none;position:relative}
+.poignee::after{content:"";position:absolute;top:8px;bottom:0;left:6px;width:2px;background:var(--v2);opacity:0}
+.poignee:hover::after,.poignee.tire::after{opacity:1}
 .cadre{border:1px solid var(--v2);position:relative;padding:18px 12px 10px;min-height:0;min-width:0;display:flex;flex-direction:column}
 .cadre>h2{position:absolute;top:-.75em;left:1ch;margin:0;padding:0 1ch;background:var(--fond);font:inherit;color:var(--v)}
 .droite{display:grid;grid-template-rows:auto 1fr auto;gap:14px;min-height:0}
@@ -89,10 +92,11 @@ p{margin:0}
   main{display:flex;flex-direction:column;gap:20px}
   .droite{display:contents}
   .droite>section:nth-child(1){order:1}
-  main>section:nth-child(2){order:2}
+  main>section:nth-of-type(2){order:2}
+  .poignee{display:none}
   .droite>section:nth-child(2){order:3}
   .droite>section:nth-child(3){order:4}
-  main>section:nth-child(1){order:5}
+  main>section:nth-of-type(1){order:5}
   #ecran{flex:none;height:min(38vh,320px)}
   textarea{min-height:7.5em}
   #essais{max-height:45vh}
@@ -111,7 +115,9 @@ p{margin:0}
 <header><button id="ouvrir" aria-haspopup="true"></button><nav id="niveaux"></nav><div id="langues"></div></header>
 <main>
   <section class="cadre"><h2><span id="t_essais"></span> <span id="compte"></span></h2><div id="essais"></div></section>
+  <div class="poignee" data-c="g"></div>
   <section class="cadre"><h2 id="titre"></h2><div id="ecran"><canvas id="arbre"></canvas></div></section>
+  <div class="poignee" data-c="d"></div>
   <div class="droite">
     <section class="cadre"><h2 id="nom"></h2><p id="consigne"></p><div id="notions"></div></section>
     <section class="cadre"><h2 id="t_regles"></h2><div id="imposes"></div><div class="saisie"><div id="marge" aria-hidden="true"></div>
@@ -1251,7 +1257,7 @@ function tout(anime,saisie){
   const z=$('essais'),lm=Math.max(...n.tests.map(w=>w.length));
   const large=Math.max(...n.tests.map(w=>lm+n.sortie(w).length))+5;
   z.style.gridTemplateColumns=`repeat(auto-fill,minmax(${large}ch,1fr))`;z.textContent='';
-  document.querySelector('main').style.gridTemplateColumns=`minmax(30ch,min(42%,max(27%,${large+5}ch))) 1fr 36ch`;
+  gaucheAuto=`minmax(30ch,min(42%,max(27%,${large+5}ch)))`;colonnes();
   n.tests.forEach((w,i)=>{const bt=document.createElement('button');bt.dataset.t=w.padEnd(lm)+' → '+(n.sortie(w)||'·');bt.textContent='· '+bt.dataset.t;
     bt.setAttribute('aria-pressed',i===j.sel);bt.onclick=()=>choisir(i);z.append(bt)});
   titrer();disposer();if(anime)t0=performance.now();peindre();juger(saisie);
@@ -1319,6 +1325,17 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('carte').hidden)carte(fal
 $('voile').onclick=()=>suite();
 /* ---------- saisie ---------- */
 const texte=$('texte');let attente=0;
+/* largeur des colonnes : deux poignées à tirer, double-clic pour revenir au réglage d'origine */
+let gaucheAuto='minmax(30ch,27%)',cols={};try{cols=JSON.parse(lit('reecriture-colonnes'))||{}}catch(e){}
+function colonnes(){document.querySelector('main').style.gridTemplateColumns=`${cols.g?cols.g+'px':gaucheAuto} 14px minmax(0,1fr) 14px ${cols.d?cols.d+'px':'36ch'}`}
+for(const p of document.querySelectorAll('.poignee')){const c=p.dataset.c;let r=0;
+  const retrace=()=>{if(r)return;r=requestAnimationFrame(()=>{r=0;mesurer();disposer();peindre()})};
+  p.onpointerdown=e=>{e.preventDefault();p.setPointerCapture(e.pointerId);p.classList.add('tire')};
+  p.onpointermove=e=>{if(!p.hasPointerCapture(e.pointerId))return;const m=document.querySelector('main').getBoundingClientRect(),
+      autre=(c==='g'?$('texte').closest('.droite'):$('essais').parentNode).getBoundingClientRect().width,max=m.width-autre-28-220;
+    cols[c]=Math.round(Math.max(160,Math.min(max,c==='g'?e.clientX-m.left-7:m.right-e.clientX-7)));colonnes();retrace()};
+  p.onpointerup=p.onpointercancel=()=>{p.classList.remove('tire');ecrit('reecriture-colonnes',JSON.stringify(cols))};
+  p.ondblclick=()=>{delete cols[c];ecrit('reecriture-colonnes',JSON.stringify(cols));colonnes();retrace()}}
 /* écran tactile : les touches du niveau remplacent le clavier du téléphone */
 const tactile=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;if(tactile)texte.inputMode='none';
 function clavier(){const z=$('touches'),n=niveau();z.hidden=!tactile;if(!tactile)return;z.textContent='';
