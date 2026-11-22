@@ -20,7 +20,8 @@
    "niveaux": "NIVEAUX",
    "casse_tete": "casse-tête",
    "valider": "valider",
-   "pas": "pas à pas"
+   "pas": "pas à pas",
+   "ref": "référence"
   },
   "niv": {
    "teinture": [
@@ -210,6 +211,10 @@
    "distribuer": [
     "Distribuer",
     "C multiplie, D additionne. Développer."
+   ],
+   "motif": [
+    "Motif",
+    "Un C s'il y a BAB."
    ]
   },
   "chapitres": [
@@ -244,7 +249,8 @@
    "niveaux": "LEVELS",
    "casse_tete": "puzzles",
    "valider": "submit",
-   "pas": "step"
+   "pas": "step",
+   "ref": "reference"
   },
   "niv": {
    "teinture": [
@@ -434,6 +440,10 @@
    "distribuer": [
     "Distribute",
     "C multiplies, D adds. Expand."
+   ],
+   "motif": [
+    "Pattern",
+    "A C if there is BAB."
    ]
   },
   "chapitres": [
@@ -468,7 +478,8 @@
    "niveaux": "NIVELES",
    "casse_tete": "rompecabezas",
    "valider": "validar",
-   "pas": "paso a paso"
+   "pas": "paso a paso",
+   "ref": "referencia"
   },
   "niv": {
    "teinture": [
@@ -658,6 +669,10 @@
    "distribuer": [
     "Distribuir",
     "C multiplica, D suma. Desarrollar."
+   ],
+   "motif": [
+    "Patrón",
+    "Una C si hay BAB."
    ]
   },
   "chapitres": [
@@ -692,7 +707,8 @@
    "niveaux": "LEVEL",
    "casse_tete": "Rätsel",
    "valider": "abgeben",
-   "pas": "Schritt"
+   "pas": "Schritt",
+   "ref": "Referenz"
   },
   "niv": {
    "teinture": [
@@ -882,6 +898,10 @@
    "distribuer": [
     "Ausmultiplizieren",
     "C multipliziert, D addiert. Ausmultiplizieren."
+   ],
+   "motif": [
+    "Muster",
+    "Ein C, wenn BAB vorkommt."
    ]
   },
   "chapitres": [

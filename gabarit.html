@@ -56,6 +56,7 @@ main{display:grid;grid-template-columns:minmax(30ch,27%) 14px minmax(0,1fr) 14px
 textarea{font:inherit;color:var(--clair);text-shadow:inherit;background:none;border:0;outline:0;resize:none;padding:0;caret-color:var(--clair);text-transform:uppercase;white-space:pre;overflow:auto}
 textarea::placeholder{color:var(--v3)}
 #compte.ok{color:var(--clair)}
+#ref{color:var(--v2)}
 #valider{align-self:start;margin-top:8px;padding:2px 2ch;color:var(--fond);background:var(--v);text-shadow:none}
 #valider[hidden]{display:none}
 #valider:hover{background:var(--clair)}
@@ -135,7 +136,7 @@ p{margin:0}
     <section class="cadre"><h2 id="nom"></h2><p id="consigne"></p><div id="notions"></div></section>
     <section class="cadre"><h2 id="t_regles"></h2><div id="imposes"></div><div class="saisie"><div id="marge" aria-hidden="true"></div>
       <textarea id="texte" spellcheck="false" autocapitalize="characters" placeholder="AA > B"></textarea></div><div id="touches" hidden></div><p id="aide"></p></section>
-    <section class="cadre"><h2 id="t_bilan"></h2><p id="bilan"></p><button id="valider" hidden></button></section>
+    <section class="cadre"><h2 id="t_bilan"></h2><p id="bilan"></p><p id="ref"></p><button id="valider" hidden></button></section>
   </div>
 </main>
 <div id="carte" hidden><div id="c_tete"><h1>RÉÉCRITURE</h1><div id="c_langues"></div><p id="c_intro"></p></div><div id="c_grille"></div></div>
@@ -313,7 +314,7 @@ function tout(anime,saisie){
   clavier();$('aide').textContent=[[...n.alphabet].sort().map(forme).join(' ')].concat(n.sig?['x y z']:[],n.ancrages?['^ $']:[],n.jokers?['1 2 = '+[...n.jokers].join(' ')]:[]).join('   ');
   texte.style.textTransform=n.sig?'none':'';texte.placeholder=n.sig?'C(x,A) > x':'AA > B';
   const zn=$('notions');zn.textContent='';for(const x of nouvelles()){const k=document.createElement('button');k.textContent='? '+x[2];k.onclick=()=>panneau([x]);zn.append(k)}
-  const b=$('bilan');b.textContent=lu.lignes+' '+U(lu.lignes>1?'regles':'regle')+', '+lu.symboles+' '+U('symboles');
+  montrerRef();const b=$('bilan');b.textContent=lu.lignes+' '+U(lu.lignes>1?'regles':'regle')+', '+lu.symboles+' '+U('symboles');
   if(n.max<10||trop){const s=document.createElement('span');s.className=trop?'ko':'';s.textContent='  ('+U('max').replace('{n}',n.max)+')';b.append(s)}
   // essais : la liste d'abord, les verdicts arrivent par tranches
   const z=$('essais'),lm=Math.max(...n.tests.map(w=>w.length));
@@ -341,8 +342,9 @@ function juger(saisie){
 /* ---------- validation : toutes les dérivations défilent, puis niveau suivant ---------- */
 const fc=$('fete'),fx=fc.getContext('2d');
 /* la réussite n'est acquise qu'à la validation, demandée par le joueur */
+function montrerRef(){const n=niveau();$('ref').textContent=faits.has(n.id)&&n.ref?U('ref')+' '+n.ref[0]+', '+n.ref[1]:''}
 function valider(){const n=niveau();if(fete||$('valider').hidden||!jeu().resolu)return;
-  if(!faits.has(n.id)){faits.add(n.id);ecrit('reecriture-faits',JSON.stringify([...faits]))}barre();feter()}
+  if(!faits.has(n.id)){faits.add(n.id);ecrit('reecriture-faits',JSON.stringify([...faits]))}barre();montrerRef();feter()}
 function feter(){
   const n=niveau(),W=innerWidth,Ht=innerHeight,px=15;let mots=0,pas=0;
   const chemins=n.tests.map(w=>{const g=explorer(w,sys,n.sortie(w),6000,n.lmax),c=[];mots+=g.N.length;
@@ -356,7 +358,8 @@ function feter(){
     return{b,dec:(v*7919)%R,x:(v+.5)*W/nv-(lv-4)*c/2}});
   const longue=Math.max(...voies.map(v=>v.b.length)),T=calme?0:Math.max(2200,Math.min(4500,longue*22));
   for(const v of voies)v.vit=Math.max(v.b.length/Math.max(T,1),.016)*(.85+((v.dec*13)%30)/100);
-  fete={t:performance.now(),T,voies,R,px,W,Ht,essais:chemins.length,mots,pas,suivant:E.niv<NIVEAUX.length-1};
+  const lu=lire(jeu().texte,n);
+  fete={t:performance.now(),T,voies,R,px,W,Ht,score:lu.lignes+' '+U(lu.lignes>1?'regles':'regle')+', '+lu.symboles+' '+U('symboles'),ref:n.ref?U('ref')+' '+n.ref[0]+', '+n.ref[1]:'',essais:chemins.length,mots,pas,suivant:E.niv<NIVEAUX.length-1};
   requestAnimationFrame(defiler);
 }
 function defiler(t){
@@ -372,13 +375,14 @@ function defiler(t){
   // cartouche : compteurs qui montent, puis niveau suivant
   const gp=Math.min(22,Math.floor((f.W-16)/23)),nb=x=>String(Math.round(x*q)).replace(/\B(?=(\d{3})+$)/g,' '),nom=num(E.niv)+' '+nomDe(niveau());
   const lignes=[nb(f.essais)+' '+U('f_essais'),nb(f.mots)+' '+U('f_mots'),nb(f.pas)+' '+U('f_pas')];
+  lignes.push('',f.score,f.ref);
   if(fin)lignes.push('',f.suivant?'↵ '+num(E.niv+1)+' '+nomDe(NIVEAUX[E.niv+1])+'     '+U('rester'):U('dernier'));
   fx.font=`${gp}px ${POLICE}`;
-  const cg=fx.measureText('A').width,lb=(Math.max(34,...lignes.map(l=>l.length))+4)*cg,hb=8*gp*1.5,bx=(f.W-lb)/2,by=(f.Ht-hb)/2;
+  const cg=fx.measureText('A').width,lb=(Math.max(34,...lignes.map(l=>l.length))+4)*cg,hb=10.6*gp*1.5,bx=(f.W-lb)/2,by=(f.Ht-hb)/2;
   fx.fillStyle='#020603';fx.fillRect(bx,by,lb,hb);fx.strokeStyle='#33e06a';fx.lineWidth=1;fx.strokeRect(bx+.5,by+.5,lb,hb);
   fx.fillStyle='#020603';fx.fillRect(bx+cg,by-gp*.6,(nom.length+2)*cg,gp*1.2);
   fx.fillStyle='#33e06a';fx.fillText(' '+nom,bx+cg,by-gp*.55);
-  lignes.forEach((l,i)=>{fx.fillStyle=i<3?'#c9ffd9':'#33e06a';fx.fillText(l,bx+2*cg,by+(i+1.2)*gp*1.5)});
+  lignes.forEach((l,i)=>{fx.fillStyle=i<3||i===4?'#c9ffd9':i===5?'#1c7a3c':'#33e06a';fx.fillText(l,bx+2*cg,by+(i+1.2)*gp*1.5)});
   requestAnimationFrame(defiler);
 }
 function finir(avance){if(!fete)return;const s=fete.suivant;fete=null;fc.hidden=true;if(avance&&s)aller(E.niv+1)}
