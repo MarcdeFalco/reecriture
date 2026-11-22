@@ -18,7 +18,8 @@
    "dernier": "dernier niveau",
    "niveau": "niveau",
    "niveaux": "NIVEAUX",
-   "casse_tete": "casse-tête"
+   "casse_tete": "casse-tête",
+   "valider": "valider"
   },
   "niv": {
    "teinture": [
@@ -240,7 +241,8 @@
    "dernier": "last level",
    "niveau": "level",
    "niveaux": "LEVELS",
-   "casse_tete": "puzzles"
+   "casse_tete": "puzzles",
+   "valider": "submit"
   },
   "niv": {
    "teinture": [
@@ -462,7 +464,8 @@
    "dernier": "último nivel",
    "niveau": "nivel",
    "niveaux": "NIVELES",
-   "casse_tete": "rompecabezas"
+   "casse_tete": "rompecabezas",
+   "valider": "validar"
   },
   "niv": {
    "teinture": [
@@ -684,7 +687,8 @@
    "dernier": "letztes Level",
    "niveau": "Level",
    "niveaux": "LEVEL",
-   "casse_tete": "Rätsel"
+   "casse_tete": "Rätsel",
+   "valider": "abgeben"
   },
   "niv": {
    "teinture": [

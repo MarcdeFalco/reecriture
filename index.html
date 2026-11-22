@@ -46,6 +46,9 @@ main{display:grid;grid-template-columns:minmax(30ch,27%) 14px minmax(0,1fr) 14px
 textarea{font:inherit;color:var(--clair);text-shadow:inherit;background:none;border:0;outline:0;resize:none;padding:0;caret-color:var(--clair);text-transform:uppercase;white-space:pre;overflow:auto}
 textarea::placeholder{color:var(--v3)}
 #compte.ok{color:var(--clair)}
+#valider{align-self:start;margin-top:8px;padding:2px 2ch;color:var(--fond);background:var(--v);text-shadow:none}
+#valider[hidden]{display:none}
+#valider:hover{background:var(--clair)}
 #aide{color:var(--v2);margin-top:6px;white-space:pre-line}
 #fete{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
 #fete[hidden]{display:none}
@@ -122,7 +125,7 @@ p{margin:0}
     <section class="cadre"><h2 id="nom"></h2><p id="consigne"></p><div id="notions"></div></section>
     <section class="cadre"><h2 id="t_regles"></h2><div id="imposes"></div><div class="saisie"><div id="marge" aria-hidden="true"></div>
       <textarea id="texte" spellcheck="false" autocapitalize="characters" placeholder="AA > B"></textarea></div><div id="touches" hidden></div><p id="aide"></p></section>
-    <section class="cadre"><h2 id="t_bilan"></h2><p id="bilan"></p></section>
+    <section class="cadre"><h2 id="t_bilan"></h2><p id="bilan"></p><button id="valider" hidden></button></section>
   </div>
 </main>
 <div id="carte" hidden><div id="c_tete"><h1>RÉÉCRITURE</h1><div id="c_langues"></div><p id="c_intro"></p></div><div id="c_grille"></div></div>
@@ -239,7 +242,8 @@ const TEXTES={
    "dernier": "dernier niveau",
    "niveau": "niveau",
    "niveaux": "NIVEAUX",
-   "casse_tete": "casse-tête"
+   "casse_tete": "casse-tête",
+   "valider": "valider"
   },
   "niv": {
    "teinture": [
@@ -461,7 +465,8 @@ const TEXTES={
    "dernier": "last level",
    "niveau": "level",
    "niveaux": "LEVELS",
-   "casse_tete": "puzzles"
+   "casse_tete": "puzzles",
+   "valider": "submit"
   },
   "niv": {
    "teinture": [
@@ -683,7 +688,8 @@ const TEXTES={
    "dernier": "último nivel",
    "niveau": "nivel",
    "niveaux": "NIVELES",
-   "casse_tete": "rompecabezas"
+   "casse_tete": "rompecabezas",
+   "valider": "validar"
   },
   "niv": {
    "teinture": [
@@ -905,7 +911,8 @@ const TEXTES={
    "dernier": "letztes Level",
    "niveau": "Level",
    "niveaux": "LEVEL",
-   "casse_tete": "Rätsel"
+   "casse_tete": "Rätsel",
+   "valider": "abgeben"
   },
   "niv": {
    "teinture": [
@@ -1263,21 +1270,24 @@ function tout(anime,saisie){
   titrer();disposer();if(anime)t0=performance.now();peindre();juger(saisie);
 }
 function juger(saisie){
-  const g=++gen,n=niveau(),j=jeu(),B=$('essais').children,c=$('compte');let i=0,ok=0;res=new Array(n.tests.length).fill(null);c.className='';
+  const g=++gen,n=niveau(),j=jeu(),B=$('essais').children,c=$('compte');let i=0,ok=0;res=new Array(n.tests.length).fill(null);c.className='';$('valider').hidden=true;
   const tranche=()=>{if(g!==gen)return;const t=performance.now();
     while(i<n.tests.length&&performance.now()-t<12){const w=n.tests[i],v=verdict(w,sys,n.sortie(w),6000,n.lmax);res[i]=v;if(v)ok++;
       B[i].className=v?'ok':'ko';B[i].textContent=(v?'✓ ':'✗ ')+B[i].dataset.t;i++}
     c.textContent=ok+'/'+n.tests.length;
     if(i<n.tests.length){setTimeout(tranche,0);return}
-    const ko=res.indexOf(false),fini=ko<0&&!trop,neuf=fini&&!j.resolu;j.resolu=fini;c.className=fini?'ok':'';
-    if(fini&&!faits.has(n.id)){faits.add(n.id);ecrit('reecriture-faits',JSON.stringify([...faits]))}barre();
+    const ko=res.indexOf(false),fini=ko<0&&!trop;j.resolu=fini;c.className=fini?'ok':'';
+    $('valider').hidden=!fini;$('valider').textContent='▶ '+U('valider')+(tactile?'':'   ctrl ↵');barre();
     // après une frappe, si l'essai affiché passe, montrer le premier qui échoue
     if(saisie&&ko>=0&&res[j.sel]){choisir(ko);B[ko].scrollIntoView({block:'nearest'})}
-    if(saisie&&neuf)feter()};
+    };
   tranche();
 }
 /* ---------- validation : toutes les dérivations défilent, puis niveau suivant ---------- */
 const fc=$('fete'),fx=fc.getContext('2d');
+/* la réussite n'est acquise qu'à la validation, demandée par le joueur */
+function valider(){const n=niveau();if(fete||$('valider').hidden||!jeu().resolu)return;
+  if(!faits.has(n.id)){faits.add(n.id);ecrit('reecriture-faits',JSON.stringify([...faits]))}barre();feter()}
 function feter(){
   const n=niveau(),W=innerWidth,Ht=innerHeight,px=15;let mots=0,pas=0;
   const chemins=n.tests.map(w=>{const g=explorer(w,sys,n.sortie(w),6000,n.lmax),c=[];mots+=g.N.length;
@@ -1325,6 +1335,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('carte').hidden)carte(fal
 $('voile').onclick=()=>suite();
 /* ---------- saisie ---------- */
 const texte=$('texte');let attente=0;
+$('valider').onclick=valider;addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!fete){e.preventDefault();e.stopPropagation();valider()}},true);
 /* largeur des colonnes : deux poignées à tirer, double-clic pour revenir au réglage d'origine */
 let gaucheAuto='minmax(30ch,27%)',cols={};try{cols=JSON.parse(lit('reecriture-colonnes'))||{}}catch(e){}
 function colonnes(){document.querySelector('main').style.gridTemplateColumns=`${cols.g?cols.g+'px':gaucheAuto} 14px minmax(0,1fr) 14px ${cols.d?cols.d+'px':'36ch'}`}
