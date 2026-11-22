@@ -112,8 +112,8 @@ const NOTIONS=[
   ['imposee','peinture-verte','▪ B > C','▪ B > C\n\nAB → AC'],
   ['auxiliaire','doubleur','+ E','AA > E\nE > B\n\nAA → E → B'],
   ['bords','rognures','^ $','^B >      BAB → AB\nB$ >      BAB → BA'],
-  ['quelconque','jumelles','1 2','11 > 1   =   AA > A\n              BB > B'],
-  ['termes','feuilles','C(A,B)','C(A,B)   E(A)   E(C(A,B))\n\nA > B\n\nC(A,E(A)) → C(B,E(A)) → C(B,E(B))'],
+  ['quelconque','tete','1 2','12 > 1   =   AA > A   AB > A\n              BA > B   BB > B'],
+  ['termes','gauche','C(A,B)','C(A,B)   E(A)   E(C(A,B))\n\nA > B\n\nC(A,E(A)) → C(B,E(A)) → C(B,E(B))'],
   ['variables','gauche','x y z','C(x,A) > x\n\nC(E(B),A) → E(B)\nC(C(B,B),A) → C(B,B)']];
 const NIVEAUX=DONNEES.niveaux.map(n=>{const m=new Map(n.tests);return{...n,tests:n.tests.map(p=>p[0]),sortie:w=>m.get(w),depart:n.ex[2],lmax:n.lmax||48,max:n.max||10,
   imposes:lire(n.imposes.join('\n'),{alphabet:'ABCDE',ancrages:true,jokers:n.jokers||'AB',sig:n.sig}).regles,imposesTxt:n.imposes}});
