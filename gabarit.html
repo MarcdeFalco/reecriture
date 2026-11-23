@@ -163,7 +163,7 @@ const NOTIONS=[
   ['quelconque','tete','1 2','12 > 1   =   AA > A   AB > A\n              BA > B   BB > B'],
   ['termes','gauche','C(A,B)','C(A,B)   E(A)   E(C(A,B))\n\nA > B\n\nC(A,E(A)) → C(B,E(A)) → C(B,E(B))'],
   ['variables','gauche','x y z','C(x,A) > x\n\nC(E(B),A) → E(B)\nC(C(B,B),A) → C(B,B)']];
-const NIVEAUX=DONNEES.niveaux.map(n=>{const m=new Map(n.tests);return{...n,tests:n.tests.map(p=>p[0]),sortie:w=>m.get(w),depart:n.ex[2],lmax:n.lmax||48,max:n.max||10,
+const NIVEAUX=DONNEES.niveaux.map(n=>{const m=new Map(n.tests);return{...n,tests:n.tests.map(p=>p[0]),sortie:w=>m.get(w),depart:n.ex[2],lmax:n.lmax||48,plafond:n.sig?6000:30000,max:n.max||10,
   imposes:lire(n.imposes.join('\n'),{alphabet:'ABCDE',ancrages:true,jokers:n.jokers||'AB',sig:n.sig}).regles,imposesTxt:n.imposes}});
 const $=id=>document.getElementById(id);
 const lit=k=>{try{return localStorage.getItem(k)}catch(e){return null}},ecrit=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
@@ -179,7 +179,7 @@ const lireJson=(k,d)=>{try{return JSON.parse(lit(k))||d}catch(e){return d}};
 const faits=new Set(lireJson('reecriture-faits',[])),vus=new Set(lireJson('reecriture-vus',[]));
 if(lit('reecriture-faits')===null){for(const n of NIVEAUX){const tx=garde[n.id];if(!tx||n.sig)continue;
     const large={...n,alphabet:'ABCDE'},lu=lire(tx,large),sy=systeme(n,n.imposes.concat(lu.regles));
-    if(lu.lignes&&n.tests.every(w=>verdict(w,sy,n.sortie(w),6000,n.lmax))){faits.add(n.id);for(const x of NOTIONS)if(x[1]===n.id)vus.add(x[0])}}
+    if(lu.lignes&&n.tests.every(w=>verdict(w,sy,n.sortie(w),n.plafond,n.lmax))){faits.add(n.id);for(const x of NOTIONS)if(x[1]===n.id)vus.add(x[0])}}
   ecrit('reecriture-faits',JSON.stringify([...faits]));ecrit('reecriture-vus',JSON.stringify([...vus]))}
 const E={niv:0,jeux:NIVEAUX.map(n=>({texte:garde[n.id]||'',sel:Math.max(0,n.tests.indexOf(n.depart)),resolu:false}))};
 const jeu=()=>E.jeux[E.niv],niveau=()=>NIVEAUX[E.niv];
@@ -190,7 +190,7 @@ let sys=null,trop=false,plan=null,choix=null,t0=0,fete=null,res=[],gen=0;
 const cv=$('arbre'),cx=cv.getContext('2d');let L=0,H=0,corps=20,cw=12;
 const police=()=>`${corps}px ${POLICE}`;
 function disposer(){
-  const n=niveau(),w=n.tests[jeu().sel],g=explorer(w,sys,n.sortie(w),6000,n.lmax),N=g.N,etages=[];
+  const n=niveau(),w=n.tests[jeu().sel],g=explorer(w,sys,n.sortie(w),n.plafond,n.lmax),N=g.N,etages=[];
   for(const x of N){(etages[x.d]||(etages[x.d]=[])).push(x);x.bx=0;x.np=0}
   plan={g,etages,mode:'points',survol:null,voie:[]};
   if(N.length<=160){let large=0;
@@ -328,7 +328,7 @@ function tout(anime,saisie){
 function juger(saisie){
   const g=++gen,n=niveau(),j=jeu(),B=$('essais').children,c=$('compte');let i=0,ok=0;res=new Array(n.tests.length).fill(null);c.className='';$('valider').hidden=true;
   const tranche=()=>{if(g!==gen)return;const t=performance.now();
-    while(i<n.tests.length&&performance.now()-t<12){const w=n.tests[i],v=verdict(w,sys,n.sortie(w),6000,n.lmax);res[i]=v;if(v)ok++;
+    while(i<n.tests.length&&performance.now()-t<12){const w=n.tests[i],v=verdict(w,sys,n.sortie(w),n.plafond,n.lmax);res[i]=v;if(v)ok++;
       B[i].className=v?'ok':'ko';B[i].textContent=(v?'✓ ':'✗ ')+B[i].dataset.t;i++}
     c.textContent=ok+'/'+n.tests.length;
     if(i<n.tests.length){setTimeout(tranche,0);return}
@@ -347,7 +347,7 @@ function valider(){const n=niveau();if(fete||$('valider').hidden||!jeu().resolu)
   if(!faits.has(n.id)){faits.add(n.id);ecrit('reecriture-faits',JSON.stringify([...faits]))}barre();montrerRef();feter()}
 function feter(){
   const n=niveau(),W=innerWidth,Ht=innerHeight,px=15;let mots=0,pas=0;
-  const chemins=n.tests.map(w=>{const g=explorer(w,sys,n.sortie(w),6000,n.lmax),c=[];mots+=g.N.length;
+  const chemins=n.tests.map(w=>{const g=explorer(w,sys,n.sortie(w),n.plafond,n.lmax),c=[];mots+=g.N.length;
     for(let k=g.N[0];;k=g.N[k.succ[0].to]){c.push(k.w||'·');if(!k.succ.length)break}pas+=c.length-1;return c});
   fc.hidden=false;fc.width=W*devicePixelRatio;fc.height=Ht*devicePixelRatio;
   fx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);fx.font=`${px}px ${POLICE}`;
@@ -437,7 +437,7 @@ cv.onpointerleave=()=>{if(plan)survoler(null)};
 cv.onclick=e=>{if(!plan)return;if(plan.mode==='points'){const b=cv.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;let m=null,dm=400;for(const n of plan.g.N){const d=(n.px-x)**2+(n.py-y)**2;if(d<dm){dm=d;m=n}}if(m)branche(m)}else{const v=vise(e);if(v)branche(v.n)}};
 addEventListener('resize',()=>{mesurer();disposer();peindre()});
 new ResizeObserver(()=>{const b=$('ecran');if(b.clientWidth!==L||b.clientHeight!==H){mesurer();disposer();peindre()}}).observe($('ecran'));
-E.jeux.forEach((j,i)=>{if(j.texte){const n=NIVEAUX[i],lu=lire(j.texte,n),rg=systeme(n,n.imposes.concat(lu.regles));j.resolu=lu.lignes<=n.max&&n.tests.every(w=>verdict(w,rg,n.sortie(w),6000,n.lmax))}});
+E.jeux.forEach((j,i)=>{if(j.texte){const n=NIVEAUX[i],lu=lire(j.texte,n),rg=systeme(n,n.imposes.concat(lu.regles));j.resolu=lu.lignes<=n.max&&n.tests.every(w=>verdict(w,rg,n.sortie(w),n.plafond,n.lmax))}});
 E.niv=Math.max(0,NIVEAUX.findIndex(n=>!faits.has(n.id)));texte.value=jeu().texte;mesurer();tout(true);carte(true);
 </script>
 </body>
